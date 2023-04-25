@@ -12,8 +12,8 @@ import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_ABSENT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static com.github.lipinskipawel.protocol.Message.messageWithBody;
+import static com.github.lipinskipawel.protocol.Message.messageWithInitBody;
 
 class MessageTest implements WithAssertions {
 
@@ -34,10 +34,15 @@ class MessageTest implements WithAssertions {
         class SerializationTest {
             @Test
             void should_serialize_complete_message_with_complete_init_body() throws JsonProcessingException {
-                var initBody = new InitBody("init", of(12), of(12), of("n1"), of(List.of("n1", "n2", "n3")));
-                var msg = new Message<>("1", "2", initBody);
+                var initMessage = messageWithInitBody("1", "2", body -> body
+                        .withType("init")
+                        .withMsgId(14)
+                        .withInReplyTo(12)
+                        .withNodeId("n1")
+                        .withNodeIds(List.of("n1", "n2", "n3"))
+                );
 
-                var json = mapper.writeValueAsString(msg);
+                var json = mapper.writeValueAsString(initMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -45,7 +50,7 @@ class MessageTest implements WithAssertions {
                             "dest":"2",
                             "body":{
                                 "type":"init",
-                                "msg_id":12,
+                                "msg_id":14,
                                 "in_reply_to":12,
                                 "node_id":"n1",
                                 "node_ids":["n1","n2","n3"]
@@ -55,10 +60,14 @@ class MessageTest implements WithAssertions {
 
             @Test
             void should_serialize_complete_message_with_not_complete_init_body() throws JsonProcessingException {
-                var initBody = new InitBody("init", of(12), empty(), of("n1"), of(List.of("n1", "n2", "n3")));
-                var msg = new Message<>("1", "2", initBody);
+                var initMessage = messageWithInitBody("1", "2", body -> body
+                        .withType("init")
+                        .withMsgId(12)
+                        .withNodeId("n1")
+                        .withNodeIds(List.of("n1", "n2", "n3"))
+                );
 
-                var json = mapper.writeValueAsString(msg);
+                var json = mapper.writeValueAsString(initMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -93,8 +102,13 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, InitBody.class));
 
-                final var initBody = new InitBody("init", of(14), of(133), of("n1"), of(List.of("n1", "n2", "n3")));
-                assertThat(message).isEqualTo(new Message<>("1", "3", initBody));
+                assertThat(message).isEqualTo(messageWithInitBody("1", "3", body -> body
+                        .withType("init")
+                        .withMsgId(14)
+                        .withInReplyTo(133)
+                        .withNodeId("n1")
+                        .withNodeIds(List.of("n1", "n2", "n3"))
+                ));
             }
         }
 
@@ -133,8 +147,12 @@ class MessageTest implements WithAssertions {
 
             var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, InitBody.class));
 
-            final var initBody = new InitBody("init", of(14), empty(), of("n1"), of(List.of("n1", "n2", "n3")));
-            assertThat(message).isEqualTo(new Message<>("1", "3", initBody));
+            assertThat(message).isEqualTo(messageWithInitBody("1", "3", body -> body
+                    .withType("init")
+                    .withMsgId(14)
+                    .withNodeId("n1")
+                    .withNodeIds(List.of("n1", "n2", "n3"))
+            ));
         }
     }
 
@@ -144,10 +162,14 @@ class MessageTest implements WithAssertions {
         class SerializationTest {
             @Test
             void should_serialize_complete_message_with_complete_body() throws JsonProcessingException {
-                var echoBody = new Body("echo", 12, of(19), "echo");
-                var msg = new Message<>("1", "2", echoBody);
+                var echoMessage = messageWithBody("1", "2", body -> body
+                        .withType("echo")
+                        .withMsgId(12)
+                        .withInReplyTo(19)
+                        .withEcho("echo")
+                );
 
-                var json = mapper.writeValueAsString(msg);
+                var json = mapper.writeValueAsString(echoMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -164,10 +186,13 @@ class MessageTest implements WithAssertions {
 
             @Test
             void should_serialize_complete_message_with_not_complete_body() throws JsonProcessingException {
-                var echoBody = new Body("echo", 12, empty(), "Repeat");
-                var msg = new Message<>("1", "2", echoBody);
+                var echoMessage = messageWithBody("1", "2", body -> body
+                        .withType("echo")
+                        .withMsgId(12)
+                        .withEcho("Repeat")
+                );
 
-                var json = mapper.writeValueAsString(msg);
+                var json = mapper.writeValueAsString(echoMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -200,8 +225,12 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, Body.class));
 
-                assertThat(message).isEqualTo(
-                        new Message<>("1", "3", new Body("echo", 14, of(21), "Repeat me")));
+                assertThat(message).isEqualTo(messageWithBody("1", "3", body -> body
+                        .withType("echo")
+                        .withMsgId(14)
+                        .withInReplyTo(21)
+                        .withEcho("Repeat me")
+                ));
             }
 
             @Test
@@ -237,8 +266,11 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, Message.class);
 
-                assertThat(message).isEqualTo(
-                        new Message<>("1", "3", new Body("echo", 14, empty(), "Repeat me")));
+                assertThat(message).isEqualTo(messageWithBody("1", "3", body -> body
+                        .withType("echo")
+                        .withMsgId(14)
+                        .withEcho("Repeat me")
+                ));
             }
         }
     }
