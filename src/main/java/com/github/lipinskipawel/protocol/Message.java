@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.function.Consumer;
 
-import static com.github.lipinskipawel.protocol.Body.Builder.bodyBuilder;
+import static com.github.lipinskipawel.protocol.EchoBody.Builder.bodyBuilder;
 import static com.github.lipinskipawel.protocol.InitBody.Builder.initBodyBuilder;
 
 public record Message<T>(
@@ -13,7 +13,7 @@ public record Message<T>(
         @JsonProperty("body") T body
 ) {
 
-    public static Message<Body> messageWithBody(String src, String dst, Consumer<Body.Builder> bodyBuilder) {
+    public static Message<EchoBody> messageWithBody(String src, String dst, Consumer<EchoBody.Builder> bodyBuilder) {
         final var builder = bodyBuilder();
         bodyBuilder.accept(builder);
         var body = builder.build();

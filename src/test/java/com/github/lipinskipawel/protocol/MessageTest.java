@@ -29,7 +29,7 @@ class MessageTest implements WithAssertions {
     }
 
     @Nested
-    class InitBodyTest {
+    class InitEchoBodyTest {
         @Nested
         class SerializationTest {
             @Test
@@ -157,7 +157,7 @@ class MessageTest implements WithAssertions {
     }
 
     @Nested
-    class BodyTest {
+    class EchoBodyTest {
         @Nested
         class SerializationTest {
             @Test
@@ -223,7 +223,7 @@ class MessageTest implements WithAssertions {
                             }
                         }""";
 
-                var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, Body.class));
+                var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class));
 
                 assertThat(message).isEqualTo(messageWithBody("1", "3", body -> body
                         .withType("echo")
@@ -246,7 +246,7 @@ class MessageTest implements WithAssertions {
                             }
                         }""";
 
-                assertThatThrownBy(() -> mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, Body.class)))
+                assertThatThrownBy(() -> mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class)))
                         .isInstanceOf(NullPointerException.class)
                         .hasMessage("Cannot invoke \"com.fasterxml.jackson.databind.JsonNode.asText()\" because the return value of \"com.fasterxml.jackson.databind.JsonNode.get(String)\" is null");
             }

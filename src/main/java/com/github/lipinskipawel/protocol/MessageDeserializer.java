@@ -58,6 +58,6 @@ public class MessageDeserializer extends StdDeserializer<Message<?>> {
         final var msgId = bodyNode.get("msg_id").asInt();
         final var inReplyTo = ofNullable(bodyNode.get("in_reply_to")).map(JsonNode::asInt);
         final var echo = bodyNode.get("echo").asText();
-        return new Body(type, msgId, inReplyTo, echo);
+        return new EchoBody(type, msgId, inReplyTo, echo);
     }
 }

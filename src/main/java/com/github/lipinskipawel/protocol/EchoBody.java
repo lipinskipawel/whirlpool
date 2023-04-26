@@ -7,7 +7,7 @@ import java.util.Optional;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-public record Body(
+public record EchoBody(
         @JsonProperty("type") String type,
         @JsonProperty("msg_id") int msgId,
         @JsonProperty("in_reply_to") Optional<Integer> inReplyTo,
@@ -47,8 +47,8 @@ public record Body(
             return this;
         }
 
-        Body build() {
-            return new Body(type, msgId, inReplyTo, echo);
+        EchoBody build() {
+            return new EchoBody(type, msgId, inReplyTo, echo);
         }
     }
 }
