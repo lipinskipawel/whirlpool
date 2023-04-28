@@ -12,8 +12,10 @@ import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_ABSENT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.github.lipinskipawel.protocol.Message.messageWithBody;
+import static com.github.lipinskipawel.protocol.Message.messageWithEchoBody;
 import static com.github.lipinskipawel.protocol.Message.messageWithInitBody;
+import static com.github.lipinskipawel.protocol.Message.messageWithUniqueBody;
+import static java.util.UUID.randomUUID;
 
 class MessageTest implements WithAssertions {
 
@@ -162,7 +164,7 @@ class MessageTest implements WithAssertions {
         class SerializationTest {
             @Test
             void should_serialize_complete_message_with_complete_body() throws JsonProcessingException {
-                var echoMessage = messageWithBody("1", "2", body -> body
+                var echoMessage = messageWithEchoBody("1", "2", body -> body
                         .withType("echo")
                         .withMsgId(12)
                         .withInReplyTo(19)
@@ -186,7 +188,7 @@ class MessageTest implements WithAssertions {
 
             @Test
             void should_serialize_complete_message_with_not_complete_body() throws JsonProcessingException {
-                var echoMessage = messageWithBody("1", "2", body -> body
+                var echoMessage = messageWithEchoBody("1", "2", body -> body
                         .withType("echo")
                         .withMsgId(12)
                         .withEcho("Repeat")
@@ -225,7 +227,7 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class));
 
-                assertThat(message).isEqualTo(messageWithBody("1", "3", body -> body
+                assertThat(message).isEqualTo(messageWithEchoBody("1", "3", body -> body
                         .withType("echo")
                         .withMsgId(14)
                         .withInReplyTo(21)
@@ -266,10 +268,134 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, Message.class);
 
-                assertThat(message).isEqualTo(messageWithBody("1", "3", body -> body
+                assertThat(message).isEqualTo(messageWithEchoBody("1", "3", body -> body
                         .withType("echo")
                         .withMsgId(14)
                         .withEcho("Repeat me")
+                ));
+            }
+        }
+    }
+
+    @Nested
+    class UniqueBodyTest {
+        @Nested
+        class SerializationTest {
+            @Test
+            void should_serialize_complete_message_with_complete_body() throws JsonProcessingException {
+                var randomUUID = randomUUID();
+                var echoMessage = messageWithUniqueBody("1", "2", body -> body
+                        .withType("echo")
+                        .withMsgId(12)
+                        .withInReplyTo(19)
+                        .withId(randomUUID)
+                );
+
+                var json = mapper.writeValueAsString(echoMessage);
+
+                assertThat(json).isEqualTo("""
+                        {
+                            "src":"1",
+                            "dest":"2",
+                            "body":{
+                                "type":"echo",
+                                "msg_id":12,
+                                "in_reply_to":19,
+                                "id":"%s"
+                            }
+                        }""".formatted(randomUUID).replaceAll("\n", "").replaceAll(" ", ""));
+            }
+
+            @Test
+            void should_serialize_complete_message_with_not_complete_body() throws JsonProcessingException {
+                var randomUUID = randomUUID();
+                var echoMessage = messageWithUniqueBody("1", "2", body -> body
+                        .withType("echo")
+                        .withMsgId(12)
+                        .withId(randomUUID)
+                );
+
+                var json = mapper.writeValueAsString(echoMessage);
+
+                assertThat(json).isEqualTo("""
+                        {
+                            "src":"1",
+                            "dest":"2",
+                            "body":{
+                                "type":"echo",
+                                "msg_id":12,
+                                "id":"%s"
+                            }
+                        }""".formatted(randomUUID).replaceAll("\n", "").replaceAll(" ", ""));
+            }
+        }
+
+        @Nested
+        class DeserializationTest {
+            @Test
+            void should_deserialize_complete_message_with_complete_body() throws JsonProcessingException {
+                var randomUUID = randomUUID();
+                var jsonMsg = """
+                        {
+                            "src":"1",
+                            "dest":"3",
+                            "body": {
+                                "type":"generate",
+                                "msg_id":14,
+                                "in_reply_to":21,
+                                "id":"%s"
+                            }
+                        }""".formatted(randomUUID);
+
+                var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class));
+
+                assertThat(message).isEqualTo(messageWithUniqueBody("1", "3", body -> body
+                        .withType("generate")
+                        .withMsgId(14)
+                        .withInReplyTo(21)
+                        .withId(randomUUID)
+                ));
+            }
+
+            @Test
+            void should_not_deserialize_message_with_required_type_in_body() {
+                var randomUUID = randomUUID();
+                var jsonMsg = """
+                        {
+                            "src":"1",
+                            "dest":"3",
+                            "body": {
+                                "msg_id":14,
+                                "in_reply_to":21,
+                                "id":"%s"
+                            }
+                        }""".formatted(randomUUID);
+
+                assertThatThrownBy(() -> mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class)))
+                        .isInstanceOf(NullPointerException.class)
+                        .hasMessage("Cannot invoke \"com.fasterxml.jackson.databind.JsonNode.asText()\" because the return value of \"com.fasterxml.jackson.databind.JsonNode.get(String)\" is null");
+            }
+
+            @Test
+            void should_deserialize_complete_message_with_not_complete_body() throws JsonProcessingException {
+                var randomUUID = randomUUID();
+                var jsonMsg = """
+                        {
+                            "src":"1",
+                            "dest":"3",
+                            "body": {
+                                "type":"generate",
+                                "msg_id":14,
+                                "id":"%s"
+                            }
+                        }""".formatted(randomUUID);
+
+                var message = mapper.readValue(jsonMsg, Message.class);
+
+                assertThat(message).isEqualTo(messageWithUniqueBody("1", "3", body -> body
+                        .withType("generate")
+                        .withMsgId(14)
+                        .withId(randomUUID)
                 ));
             }
         }

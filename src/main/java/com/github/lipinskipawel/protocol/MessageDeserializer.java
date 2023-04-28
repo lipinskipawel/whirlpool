@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
@@ -35,6 +36,7 @@ public class MessageDeserializer extends StdDeserializer<Message<?>> {
         return switch (typeOfBody) {
             case "init" -> initBody(bodyNode);
             case "echo" -> echoBody(bodyNode);
+            case "generate" -> uniqueBody(bodyNode);
             default -> throw new NoSuchElementException("Unknown type of message body {%s}".formatted(typeOfBody));
         };
     }
@@ -59,5 +61,13 @@ public class MessageDeserializer extends StdDeserializer<Message<?>> {
         final var inReplyTo = ofNullable(bodyNode.get("in_reply_to")).map(JsonNode::asInt);
         final var echo = bodyNode.get("echo").asText();
         return new EchoBody(type, msgId, inReplyTo, echo);
+    }
+
+    private Object uniqueBody(JsonNode bodyNode) {
+        final var type = bodyNode.get("type").asText();
+        final var msgId = bodyNode.get("msg_id").asInt();
+        final var inReplyTo = ofNullable(bodyNode.get("in_reply_to")).map(JsonNode::asInt);
+        final var id = ofNullable(bodyNode.get("id")).map(JsonNode::asText).map(UUID::fromString);
+        return new UniqueBody(type, msgId, inReplyTo, id);
     }
 }

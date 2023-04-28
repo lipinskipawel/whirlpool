@@ -3,27 +3,28 @@ package com.github.lipinskipawel.protocol;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-public record EchoBody(
+public record UniqueBody(
         @JsonProperty("type") String type,
         @JsonProperty("msg_id") int msgId,
         @JsonProperty("in_reply_to") Optional<Integer> inReplyTo,
-        @JsonProperty("echo") String echo
+        @JsonProperty("id") Optional<UUID> id
 ) {
 
     public static final class Builder {
         private String type;
         private int msgId;
         private Optional<Integer> inReplyTo = empty();
-        private String echo;
+        private Optional<UUID> id = empty();
 
         private Builder() {
         }
 
-        public static Builder echoBodyBuilder() {
+        public static Builder uniqueBodyBuilder() {
             return new Builder();
         }
 
@@ -42,13 +43,13 @@ public record EchoBody(
             return this;
         }
 
-        public Builder withEcho(String echo) {
-            this.echo = echo;
+        public Builder withId(UUID id) {
+            this.id = of(id);
             return this;
         }
 
-        EchoBody build() {
-            return new EchoBody(type, msgId, inReplyTo, echo);
+        UniqueBody build() {
+            return new UniqueBody(type, msgId, inReplyTo, id);
         }
     }
 }

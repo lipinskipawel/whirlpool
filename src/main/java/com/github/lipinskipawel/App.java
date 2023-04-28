@@ -5,6 +5,7 @@ import com.github.lipinskipawel.echo.EchoResponder;
 import com.github.lipinskipawel.protocol.InitBody;
 import com.github.lipinskipawel.protocol.Json;
 import com.github.lipinskipawel.protocol.Message;
+import com.github.lipinskipawel.unique.UniqueResponder;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -17,6 +18,7 @@ import static com.github.lipinskipawel.protocol.Message.messageWithInitBody;
  */
 public class App {
     private static final EchoResponder echoResponder = new EchoResponder();
+    private static final UniqueResponder uniqueResponder = new UniqueResponder();
 
     public static void main(String[] args) {
         parse(System.in);
@@ -35,7 +37,7 @@ public class App {
 
             while (scanner.hasNextLine()) {
                 final var request = scanner.nextLine();
-                System.out.println(echoResponder.handle(request));
+                System.out.println(uniqueResponder.handle(request));
             }
         }
     }
