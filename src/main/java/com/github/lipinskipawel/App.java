@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.lipinskipawel.protocol.InitBody;
 import com.github.lipinskipawel.protocol.Json;
 import com.github.lipinskipawel.protocol.Message;
+import com.github.lipinskipawel.workload.BroadcastResponder;
 import com.github.lipinskipawel.workload.EchoResponder;
 import com.github.lipinskipawel.workload.UniqueResponder;
 
@@ -19,6 +20,7 @@ import static com.github.lipinskipawel.protocol.Message.messageWithInitBody;
 public class App {
     private static final EchoResponder echoResponder = new EchoResponder();
     private static final UniqueResponder uniqueResponder = new UniqueResponder();
+    private static final BroadcastResponder broadcastResponder = new BroadcastResponder();
 
     public static void main(String[] args) {
         parse(System.in);
@@ -37,7 +39,7 @@ public class App {
 
             while (scanner.hasNextLine()) {
                 final var request = scanner.nextLine();
-                System.out.println(uniqueResponder.handle(request));
+                System.out.println(broadcastResponder.handle(request));
             }
         }
     }

@@ -36,4 +36,13 @@ public final class Json {
             throw new RuntimeException(e);
         }
     }
+
+    public static String typeOfJson(String json) {
+        try {
+            final var tree = mapper.readTree(json);
+            return tree.get("body").get("type").asText();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
