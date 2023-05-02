@@ -1,4 +1,4 @@
-package com.github.lipinskipawel.unique;
+package com.github.lipinskipawel.workload;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.lipinskipawel.protocol.Message;

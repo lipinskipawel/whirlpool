@@ -1,11 +1,11 @@
 package com.github.lipinskipawel;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.lipinskipawel.echo.EchoResponder;
 import com.github.lipinskipawel.protocol.InitBody;
 import com.github.lipinskipawel.protocol.Json;
 import com.github.lipinskipawel.protocol.Message;
-import com.github.lipinskipawel.unique.UniqueResponder;
+import com.github.lipinskipawel.workload.EchoResponder;
+import com.github.lipinskipawel.workload.UniqueResponder;
 
 import java.io.InputStream;
 import java.util.Scanner;
