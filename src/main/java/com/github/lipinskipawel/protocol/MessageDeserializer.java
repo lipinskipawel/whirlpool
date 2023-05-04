@@ -41,7 +41,7 @@ public class MessageDeserializer extends StdDeserializer<Message<?>> {
             case "init" -> initBody(bodyNode);
             case "echo" -> echoBody(bodyNode);
             case "generate" -> uniqueBody(bodyNode);
-            case "broadcast" -> broadcastBody(bodyNode);
+            case "broadcast", "internal" -> broadcastBody(bodyNode);
             case "read" -> readBody(bodyNode);
             case "topology" -> topologyBody(bodyNode);
             default -> throw new NoSuchElementException("Unknown type of message body {%s}".formatted(typeOfBody));
@@ -83,7 +83,13 @@ public class MessageDeserializer extends StdDeserializer<Message<?>> {
         final var msgId = ofNullable(bodyNode.get("msg_id")).map(JsonNode::asInt);
         final var inReplyTo = ofNullable(bodyNode.get("in_reply_to")).map(JsonNode::asInt);
         final var message = ofNullable(bodyNode.get("message")).map(JsonNode::asInt);
-        return new BroadcastBody(type, msgId, inReplyTo, message);
+        final var messagesFromOtherNode = ofNullable(bodyNode.get("messages_from_other_node"))
+                .map(JsonNode::elements)
+                .map(it -> spliteratorUnknownSize(it, 0))
+                .map(it -> stream(it, false))
+                .map(it -> it.map(JsonNode::asInt))
+                .map(Stream::toList);
+        return new BroadcastBody(type, msgId, inReplyTo, message, messagesFromOtherNode);
     }
 
     private Object readBody(JsonNode bodyNode) {

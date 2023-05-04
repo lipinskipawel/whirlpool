@@ -20,7 +20,7 @@ import static com.github.lipinskipawel.protocol.Message.messageWithInitBody;
 public class App {
     private static final EchoResponder echoResponder = new EchoResponder();
     private static final UniqueResponder uniqueResponder = new UniqueResponder();
-    private static final BroadcastResponder broadcastResponder = new BroadcastResponder();
+    private static BroadcastResponder broadcastResponder;
 
     public static void main(String[] args) {
         parse(System.in);
@@ -35,11 +35,12 @@ public class App {
                     .withType("init_ok")
                     .withInReplyTo(1)
             ));
+            broadcastResponder = new BroadcastResponder(initMessage.body().nodeId().get(), initMessage.body().nodeIds().get());
             System.out.println(initOk);
 
             while (scanner.hasNextLine()) {
                 final var request = scanner.nextLine();
-                System.out.println(broadcastResponder.handle(request));
+                broadcastResponder.handle(request);
             }
         }
     }
