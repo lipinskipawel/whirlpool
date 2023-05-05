@@ -9,6 +9,8 @@ import com.github.lipinskipawel.protocol.TopologyBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.github.lipinskipawel.protocol.Message.messageWithBroadcastBody;
 import static com.github.lipinskipawel.protocol.Message.messageWithReadBody;
@@ -21,6 +23,9 @@ import static java.util.function.Predicate.not;
  * <p>
  * Run broadcast 3b maelstrom workload
  * ./maelstrom test -w broadcast --bin whirlpool.sh --node-count 5 --time-limit 20 --rate 10
+ * <p>
+ * Run broadcast 3c maelstrom workload
+ * ./maelstrom test -w broadcast --bin whirlpool.sh --node-count 5 --time-limit 20 --rate 10 --nemesis partition
  */
 public final class BroadcastResponder {
     private final String nodeId;
@@ -107,7 +112,11 @@ public final class BroadcastResponder {
             return;
         }
 
-        this.messages.clear();
-        internalMessage.body().messagesFromOtherNode().ifPresent(this.messages::addAll);
+        final var our = Set.copyOf(this.messages);
+        final var theirs = Set.copyOf(internalMessage.body().messagesFromOtherNode().get());
+        final var distinctValues = Stream.concat(our.stream(), theirs.stream())
+                .distinct()
+                .toList();
+        this.messages.addAll(distinctValues);
     }
 }
