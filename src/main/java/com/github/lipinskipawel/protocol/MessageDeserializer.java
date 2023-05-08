@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -89,7 +90,13 @@ public class MessageDeserializer extends StdDeserializer<Message<?>> {
                 .map(it -> stream(it, false))
                 .map(it -> it.map(JsonNode::asInt))
                 .map(Stream::toList);
-        return new BroadcastBody(type, msgId, inReplyTo, message, messagesFromOtherNode);
+        final var visitedNodes = ofNullable(bodyNode.get("visited_nodes"))
+                .map(JsonNode::elements)
+                .map(it -> spliteratorUnknownSize(it, 0))
+                .map(it -> stream(it, false))
+                .map(it -> it.map(JsonNode::asText))
+                .map(Stream::toList);
+        return new BroadcastBody(type, msgId, inReplyTo, message, messagesFromOtherNode, visitedNodes);
     }
 
     private Object readBody(JsonNode bodyNode) {

@@ -13,7 +13,8 @@ public record BroadcastBody(
         @JsonProperty("msg_id") Optional<Integer> msgId,
         @JsonProperty("in_reply_to") Optional<Integer> inReplyTo,
         @JsonProperty("message") Optional<Integer> message,
-        @JsonProperty("messages_from_other_node") Optional<List<Integer>> messagesFromOtherNode
+        @JsonProperty("messages_from_other_node") Optional<List<Integer>> messagesFromOtherNode,
+        @JsonProperty("visited_nodes") Optional<List<String>> visitedNodes
 ) {
 
     public static final class Builder {
@@ -21,6 +22,7 @@ public record BroadcastBody(
         private Optional<Integer> msgId = empty();
         private Optional<Integer> inReplyTo = empty();
         private Optional<List<Integer>> messagesFromOtherNode = empty();
+        private Optional<List<String>> visitedNodes = empty();
 
         private Builder() {
         }
@@ -49,8 +51,13 @@ public record BroadcastBody(
             return this;
         }
 
+        public Builder withVisitedNodes(List<String> visitedNodes) {
+            this.visitedNodes = of(visitedNodes);
+            return this;
+        }
+
         BroadcastBody build() {
-            return new BroadcastBody(type, msgId, inReplyTo, empty(), messagesFromOtherNode);
+            return new BroadcastBody(type, msgId, inReplyTo, empty(), messagesFromOtherNode, visitedNodes);
         }
     }
 }
