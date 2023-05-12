@@ -22,11 +22,11 @@ public class App {
     private static final UniqueResponder uniqueResponder = new UniqueResponder();
     private static BroadcastResponder broadcastResponder;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         parse(System.in);
     }
 
-    private static void parse(InputStream inputStream) {
+    private static void parse(InputStream inputStream) throws InterruptedException {
         try (var scanner = new Scanner(inputStream)) {
             final var initRequest = scanner.nextLine();
             final var initMessage = Json.toObject(initRequest, new TypeReference<Message<InitBody>>() {
@@ -42,6 +42,7 @@ public class App {
                 final var request = scanner.nextLine();
                 broadcastResponder.handle(request);
             }
+            broadcastResponder.handle("quit");
         }
     }
 }
