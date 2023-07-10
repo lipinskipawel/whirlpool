@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -29,11 +28,12 @@ public class MessageDeserializer extends StdDeserializer<Message<?>> {
     public Message<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         final JsonNode tree = p.getCodec().readTree(p);
 
+        final var id = tree.get("id").asInt();
         final var src = tree.get("src").asText();
         final var dst = tree.get("dest").asText();
         final var body = deserializeBody(tree.get("body"));
 
-        return new Message<>(src, dst, body);
+        return new Message<>(id, src, dst, body);
     }
 
     private Object deserializeBody(JsonNode bodyNode) {
