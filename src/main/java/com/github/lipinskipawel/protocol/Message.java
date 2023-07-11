@@ -26,6 +26,13 @@ public record Message<T>(
         return new Message<>(ThreadLocalRandom.current().nextInt(), src, dst, body);
     }
 
+    public static Message<InitBody> messageWithInitBody(int msgNumber, String src, String dst, Consumer<InitBody.Builder> bodyBuilder) {
+        final var builder = initBodyBuilder();
+        bodyBuilder.accept(builder);
+        var body = builder.build();
+        return new Message<>(msgNumber, src, dst, body);
+    }
+
     public static Message<EchoBody> messageWithEchoBody(String src, String dst, Consumer<EchoBody.Builder> bodyBuilder) {
         final var builder = echoBodyBuilder();
         bodyBuilder.accept(builder);
@@ -33,11 +40,25 @@ public record Message<T>(
         return new Message<>(ThreadLocalRandom.current().nextInt(), src, dst, body);
     }
 
+    public static Message<EchoBody> messageWithEchoBody(int msgNumber, String src, String dst, Consumer<EchoBody.Builder> bodyBuilder) {
+        final var builder = echoBodyBuilder();
+        bodyBuilder.accept(builder);
+        var body = builder.build();
+        return new Message<>(msgNumber, src, dst, body);
+    }
+
     public static Message<UniqueBody> messageWithUniqueBody(String src, String dst, Consumer<UniqueBody.Builder> bodyBuilder) {
         final var builder = uniqueBodyBuilder();
         bodyBuilder.accept(builder);
         var body = builder.build();
         return new Message<>(ThreadLocalRandom.current().nextInt(), src, dst, body);
+    }
+
+    public static Message<UniqueBody> messageWithUniqueBody(int msgNumber, String src, String dst, Consumer<UniqueBody.Builder> bodyBuilder) {
+        final var builder = uniqueBodyBuilder();
+        bodyBuilder.accept(builder);
+        var body = builder.build();
+        return new Message<>(msgNumber, src, dst, body);
     }
 
     public static Message<BroadcastBody> messageWithBroadcastBody(String src, String dst, Consumer<BroadcastBody.Builder> bodyBuilder) {

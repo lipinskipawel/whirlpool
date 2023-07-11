@@ -36,7 +36,7 @@ class MessageTest implements WithAssertions {
         class SerializationTest {
             @Test
             void should_serialize_complete_message_with_complete_init_body() throws JsonProcessingException {
-                var initMessage = messageWithInitBody("1", "2", body -> body
+                var initMessage = messageWithInitBody(123, "1", "2", body -> body
                         .withType("init")
                         .withMsgId(14)
                         .withInReplyTo(12)
@@ -48,6 +48,7 @@ class MessageTest implements WithAssertions {
 
                 assertThat(json).isEqualTo("""
                         {
+                            "id":123,
                             "src":"1",
                             "dest":"2",
                             "body":{
@@ -62,7 +63,7 @@ class MessageTest implements WithAssertions {
 
             @Test
             void should_serialize_complete_message_with_not_complete_init_body() throws JsonProcessingException {
-                var initMessage = messageWithInitBody("1", "2", body -> body
+                var initMessage = messageWithInitBody(145, "1", "2", body -> body
                         .withType("init")
                         .withMsgId(12)
                         .withNodeId("n1")
@@ -73,6 +74,7 @@ class MessageTest implements WithAssertions {
 
                 assertThat(json).isEqualTo("""
                         {
+                            "id":145,
                             "src":"1",
                             "dest":"2",
                             "body":{
@@ -91,6 +93,7 @@ class MessageTest implements WithAssertions {
             void should_deserialize_complete_message_with_complete_init_body() throws JsonProcessingException {
                 var jsonMsg = """
                         {
+                            "id":123,
                             "src":"1",
                             "dest":"3",
                             "body": {
@@ -104,7 +107,7 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, InitBody.class));
 
-                assertThat(message).isEqualTo(messageWithInitBody("1", "3", body -> body
+                assertThat(message).isEqualTo(messageWithInitBody(123, "1", "3", body -> body
                         .withType("init")
                         .withMsgId(14)
                         .withInReplyTo(133)
@@ -118,6 +121,7 @@ class MessageTest implements WithAssertions {
         void should_not_deserialize_message_with_required_type_in_init_body() {
             var jsonMsg = """
                     {
+                        "id":1,
                         "src":"1",
                         "dest":"3",
                         "body": {
@@ -137,6 +141,7 @@ class MessageTest implements WithAssertions {
         void should_deserialize_complete_message_with_not_complete_init_body() throws JsonProcessingException {
             var jsonMsg = """
                     {
+                        "id":1,
                         "src":"1",
                         "dest":"3",
                         "body": {
@@ -149,7 +154,7 @@ class MessageTest implements WithAssertions {
 
             var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, InitBody.class));
 
-            assertThat(message).isEqualTo(messageWithInitBody("1", "3", body -> body
+            assertThat(message).isEqualTo(messageWithInitBody(1, "1", "3", body -> body
                     .withType("init")
                     .withMsgId(14)
                     .withNodeId("n1")
@@ -164,7 +169,7 @@ class MessageTest implements WithAssertions {
         class SerializationTest {
             @Test
             void should_serialize_complete_message_with_complete_body() throws JsonProcessingException {
-                var echoMessage = messageWithEchoBody("1", "2", body -> body
+                var echoMessage = messageWithEchoBody(12, "1", "2", body -> body
                         .withType("echo")
                         .withMsgId(12)
                         .withInReplyTo(19)
@@ -175,6 +180,7 @@ class MessageTest implements WithAssertions {
 
                 assertThat(json).isEqualTo("""
                         {
+                            "id":12,
                             "src":"1",
                             "dest":"2",
                             "body":{
@@ -188,7 +194,7 @@ class MessageTest implements WithAssertions {
 
             @Test
             void should_serialize_complete_message_with_not_complete_body() throws JsonProcessingException {
-                var echoMessage = messageWithEchoBody("1", "2", body -> body
+                var echoMessage = messageWithEchoBody(12, "1", "2", body -> body
                         .withType("echo")
                         .withMsgId(12)
                         .withEcho("Repeat")
@@ -198,6 +204,7 @@ class MessageTest implements WithAssertions {
 
                 assertThat(json).isEqualTo("""
                         {
+                            "id":12,
                             "src":"1",
                             "dest":"2",
                             "body":{
@@ -215,6 +222,7 @@ class MessageTest implements WithAssertions {
             void should_deserialize_complete_message_with_complete_body() throws JsonProcessingException {
                 var jsonMsg = """
                         {
+                            "id":"0",
                             "src":"1",
                             "dest":"3",
                             "body": {
@@ -227,7 +235,7 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class));
 
-                assertThat(message).isEqualTo(messageWithEchoBody("1", "3", body -> body
+                assertThat(message).isEqualTo(messageWithEchoBody(0, "1", "3", body -> body
                         .withType("echo")
                         .withMsgId(14)
                         .withInReplyTo(21)
@@ -238,7 +246,8 @@ class MessageTest implements WithAssertions {
             @Test
             void should_not_deserialize_message_with_required_type_in_body() {
                 var jsonMsg = """
-                        {
+                         {
+                            "id":"0",
                             "src":"1",
                             "dest":"3",
                             "body": {
@@ -257,6 +266,7 @@ class MessageTest implements WithAssertions {
             void should_deserialize_complete_message_with_not_complete_body() throws JsonProcessingException {
                 var jsonMsg = """
                         {
+                            "id":"0",
                             "src":"1",
                             "dest":"3",
                             "body": {
@@ -268,7 +278,7 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, Message.class);
 
-                assertThat(message).isEqualTo(messageWithEchoBody("1", "3", body -> body
+                assertThat(message).isEqualTo(messageWithEchoBody(0, "1", "3", body -> body
                         .withType("echo")
                         .withMsgId(14)
                         .withEcho("Repeat me")
@@ -284,7 +294,7 @@ class MessageTest implements WithAssertions {
             @Test
             void should_serialize_complete_message_with_complete_body() throws JsonProcessingException {
                 var randomUUID = randomUUID();
-                var echoMessage = messageWithUniqueBody("1", "2", body -> body
+                var echoMessage = messageWithUniqueBody(0, "1", "2", body -> body
                         .withType("echo")
                         .withMsgId(12)
                         .withInReplyTo(19)
@@ -295,6 +305,7 @@ class MessageTest implements WithAssertions {
 
                 assertThat(json).isEqualTo("""
                         {
+                            "id":0,
                             "src":"1",
                             "dest":"2",
                             "body":{
@@ -309,7 +320,7 @@ class MessageTest implements WithAssertions {
             @Test
             void should_serialize_complete_message_with_not_complete_body() throws JsonProcessingException {
                 var randomUUID = randomUUID();
-                var echoMessage = messageWithUniqueBody("1", "2", body -> body
+                var echoMessage = messageWithUniqueBody(0, "1", "2", body -> body
                         .withType("echo")
                         .withMsgId(12)
                         .withId(randomUUID)
@@ -319,6 +330,7 @@ class MessageTest implements WithAssertions {
 
                 assertThat(json).isEqualTo("""
                         {
+                            "id":0,
                             "src":"1",
                             "dest":"2",
                             "body":{
@@ -337,6 +349,7 @@ class MessageTest implements WithAssertions {
                 var randomUUID = randomUUID();
                 var jsonMsg = """
                         {
+                            "id":"0",
                             "src":"1",
                             "dest":"3",
                             "body": {
@@ -349,7 +362,7 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class));
 
-                assertThat(message).isEqualTo(messageWithUniqueBody("1", "3", body -> body
+                assertThat(message).isEqualTo(messageWithUniqueBody(0, "1", "3", body -> body
                         .withType("generate")
                         .withMsgId(14)
                         .withInReplyTo(21)
@@ -362,6 +375,7 @@ class MessageTest implements WithAssertions {
                 var randomUUID = randomUUID();
                 var jsonMsg = """
                         {
+                            "id":"0",
                             "src":"1",
                             "dest":"3",
                             "body": {
@@ -381,6 +395,7 @@ class MessageTest implements WithAssertions {
                 var randomUUID = randomUUID();
                 var jsonMsg = """
                         {
+                            "id":"0",
                             "src":"1",
                             "dest":"3",
                             "body": {
@@ -392,7 +407,7 @@ class MessageTest implements WithAssertions {
 
                 var message = mapper.readValue(jsonMsg, Message.class);
 
-                assertThat(message).isEqualTo(messageWithUniqueBody("1", "3", body -> body
+                assertThat(message).isEqualTo(messageWithUniqueBody(0, "1", "3", body -> body
                         .withType("generate")
                         .withMsgId(14)
                         .withId(randomUUID)
