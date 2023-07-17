@@ -1,17 +1,14 @@
 package com.github.lipinskipawel.protocol;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_ABSENT;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.github.lipinskipawel.protocol.Json.toJson;
+import static com.github.lipinskipawel.protocol.Json.toObject;
 import static com.github.lipinskipawel.protocol.Message.messageWithEchoBody;
 import static com.github.lipinskipawel.protocol.Message.messageWithInitBody;
 import static com.github.lipinskipawel.protocol.Message.messageWithUniqueBody;
@@ -19,23 +16,12 @@ import static java.util.UUID.randomUUID;
 
 class MessageTest implements WithAssertions {
 
-    private final ObjectMapper mapper = configureObjectMapper();
-
-    private ObjectMapper configureObjectMapper() {
-        return new ObjectMapper()
-                .registerModule(new Jdk8Module())
-                .registerModule(new SimpleModule()
-                        .addDeserializer(Message.class, new MessageDeserializer()))
-                .configure(FAIL_ON_UNKNOWN_PROPERTIES, true)
-                .setSerializationInclusion(NON_ABSENT);
-    }
-
     @Nested
     class InitEchoBodyTest {
         @Nested
         class SerializationTest {
             @Test
-            void should_serialize_complete_message_with_complete_init_body() throws JsonProcessingException {
+            void should_serialize_complete_message_with_complete_init_body() {
                 var initMessage = messageWithInitBody(123, "1", "2", body -> body
                         .withType("init")
                         .withMsgId(14)
@@ -44,7 +30,7 @@ class MessageTest implements WithAssertions {
                         .withNodeIds(List.of("n1", "n2", "n3"))
                 );
 
-                var json = mapper.writeValueAsString(initMessage);
+                var json = toJson(initMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -62,7 +48,7 @@ class MessageTest implements WithAssertions {
             }
 
             @Test
-            void should_serialize_complete_message_with_not_complete_init_body() throws JsonProcessingException {
+            void should_serialize_complete_message_with_not_complete_init_body() {
                 var initMessage = messageWithInitBody(145, "1", "2", body -> body
                         .withType("init")
                         .withMsgId(12)
@@ -70,7 +56,7 @@ class MessageTest implements WithAssertions {
                         .withNodeIds(List.of("n1", "n2", "n3"))
                 );
 
-                var json = mapper.writeValueAsString(initMessage);
+                var json = toJson(initMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -90,7 +76,7 @@ class MessageTest implements WithAssertions {
         @Nested
         class DeserializationTest {
             @Test
-            void should_deserialize_complete_message_with_complete_init_body() throws JsonProcessingException {
+            void should_deserialize_complete_message_with_complete_init_body() {
                 var jsonMsg = """
                         {
                             "id":123,
@@ -105,7 +91,8 @@ class MessageTest implements WithAssertions {
                             }
                         }""";
 
-                var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, InitBody.class));
+                var message = toObject(jsonMsg, new TypeReference<Message<InitBody>>() {
+                });
 
                 assertThat(message).isEqualTo(messageWithInitBody(123, "1", "3", body -> body
                         .withType("init")
@@ -132,13 +119,14 @@ class MessageTest implements WithAssertions {
                         }
                     }""";
 
-            assertThatThrownBy(() -> mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, InitBody.class)))
+            assertThatThrownBy(() -> toObject(jsonMsg, new TypeReference<Message<InitBody>>() {
+            }))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage("Cannot invoke \"com.fasterxml.jackson.databind.JsonNode.asText()\" because the return value of \"com.fasterxml.jackson.databind.JsonNode.get(String)\" is null");
         }
 
         @Test
-        void should_deserialize_complete_message_with_not_complete_init_body() throws JsonProcessingException {
+        void should_deserialize_complete_message_with_not_complete_init_body() {
             var jsonMsg = """
                     {
                         "id":1,
@@ -152,7 +140,8 @@ class MessageTest implements WithAssertions {
                         }
                     }""";
 
-            var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, InitBody.class));
+            var message = toObject(jsonMsg, new TypeReference<Message<InitBody>>() {
+            });
 
             assertThat(message).isEqualTo(messageWithInitBody(1, "1", "3", body -> body
                     .withType("init")
@@ -168,7 +157,7 @@ class MessageTest implements WithAssertions {
         @Nested
         class SerializationTest {
             @Test
-            void should_serialize_complete_message_with_complete_body() throws JsonProcessingException {
+            void should_serialize_complete_message_with_complete_body() {
                 var echoMessage = messageWithEchoBody(12, "1", "2", body -> body
                         .withType("echo")
                         .withMsgId(12)
@@ -176,7 +165,7 @@ class MessageTest implements WithAssertions {
                         .withEcho("echo")
                 );
 
-                var json = mapper.writeValueAsString(echoMessage);
+                var json = toJson(echoMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -193,14 +182,14 @@ class MessageTest implements WithAssertions {
             }
 
             @Test
-            void should_serialize_complete_message_with_not_complete_body() throws JsonProcessingException {
+            void should_serialize_complete_message_with_not_complete_body() {
                 var echoMessage = messageWithEchoBody(12, "1", "2", body -> body
                         .withType("echo")
                         .withMsgId(12)
                         .withEcho("Repeat")
                 );
 
-                var json = mapper.writeValueAsString(echoMessage);
+                var json = toJson(echoMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -219,7 +208,7 @@ class MessageTest implements WithAssertions {
         @Nested
         class DeserializationTest {
             @Test
-            void should_deserialize_complete_message_with_complete_body() throws JsonProcessingException {
+            void should_deserialize_complete_message_with_complete_body() {
                 var jsonMsg = """
                         {
                             "id":"0",
@@ -233,7 +222,8 @@ class MessageTest implements WithAssertions {
                             }
                         }""";
 
-                var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class));
+                var message = toObject(jsonMsg, new TypeReference<Message<EchoBody>>() {
+                });
 
                 assertThat(message).isEqualTo(messageWithEchoBody(0, "1", "3", body -> body
                         .withType("echo")
@@ -257,13 +247,14 @@ class MessageTest implements WithAssertions {
                             }
                         }""";
 
-                assertThatThrownBy(() -> mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class)))
+                assertThatThrownBy(() -> toObject(jsonMsg, new TypeReference<Message<EchoBody>>() {
+                }))
                         .isInstanceOf(NullPointerException.class)
                         .hasMessage("Cannot invoke \"com.fasterxml.jackson.databind.JsonNode.asText()\" because the return value of \"com.fasterxml.jackson.databind.JsonNode.get(String)\" is null");
             }
 
             @Test
-            void should_deserialize_complete_message_with_not_complete_body() throws JsonProcessingException {
+            void should_deserialize_complete_message_with_not_complete_body() {
                 var jsonMsg = """
                         {
                             "id":"0",
@@ -276,7 +267,8 @@ class MessageTest implements WithAssertions {
                             }
                         }""";
 
-                var message = mapper.readValue(jsonMsg, Message.class);
+                var message = toObject(jsonMsg, new TypeReference<Message<EchoBody>>() {
+                });
 
                 assertThat(message).isEqualTo(messageWithEchoBody(0, "1", "3", body -> body
                         .withType("echo")
@@ -292,7 +284,7 @@ class MessageTest implements WithAssertions {
         @Nested
         class SerializationTest {
             @Test
-            void should_serialize_complete_message_with_complete_body() throws JsonProcessingException {
+            void should_serialize_complete_message_with_complete_body() {
                 var randomUUID = randomUUID();
                 var echoMessage = messageWithUniqueBody(0, "1", "2", body -> body
                         .withType("echo")
@@ -301,7 +293,7 @@ class MessageTest implements WithAssertions {
                         .withId(randomUUID)
                 );
 
-                var json = mapper.writeValueAsString(echoMessage);
+                var json = toJson(echoMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -318,7 +310,7 @@ class MessageTest implements WithAssertions {
             }
 
             @Test
-            void should_serialize_complete_message_with_not_complete_body() throws JsonProcessingException {
+            void should_serialize_complete_message_with_not_complete_body() {
                 var randomUUID = randomUUID();
                 var echoMessage = messageWithUniqueBody(0, "1", "2", body -> body
                         .withType("echo")
@@ -326,7 +318,7 @@ class MessageTest implements WithAssertions {
                         .withId(randomUUID)
                 );
 
-                var json = mapper.writeValueAsString(echoMessage);
+                var json = toJson(echoMessage);
 
                 assertThat(json).isEqualTo("""
                         {
@@ -345,7 +337,7 @@ class MessageTest implements WithAssertions {
         @Nested
         class DeserializationTest {
             @Test
-            void should_deserialize_complete_message_with_complete_body() throws JsonProcessingException {
+            void should_deserialize_complete_message_with_complete_body() {
                 var randomUUID = randomUUID();
                 var jsonMsg = """
                         {
@@ -360,7 +352,8 @@ class MessageTest implements WithAssertions {
                             }
                         }""".formatted(randomUUID);
 
-                var message = mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class));
+                var message = toObject(jsonMsg, new TypeReference<Message<EchoBody>>() {
+                });
 
                 assertThat(message).isEqualTo(messageWithUniqueBody(0, "1", "3", body -> body
                         .withType("generate")
@@ -385,13 +378,14 @@ class MessageTest implements WithAssertions {
                             }
                         }""".formatted(randomUUID);
 
-                assertThatThrownBy(() -> mapper.readValue(jsonMsg, mapper.getTypeFactory().constructParametricType(Message.class, EchoBody.class)))
+                assertThatThrownBy(() -> toObject(jsonMsg, new TypeReference<Message<EchoBody>>() {
+                }))
                         .isInstanceOf(NullPointerException.class)
                         .hasMessage("Cannot invoke \"com.fasterxml.jackson.databind.JsonNode.asText()\" because the return value of \"com.fasterxml.jackson.databind.JsonNode.get(String)\" is null");
             }
 
             @Test
-            void should_deserialize_complete_message_with_not_complete_body() throws JsonProcessingException {
+            void should_deserialize_complete_message_with_not_complete_body() {
                 var randomUUID = randomUUID();
                 var jsonMsg = """
                         {
@@ -405,7 +399,8 @@ class MessageTest implements WithAssertions {
                             }
                         }""".formatted(randomUUID);
 
-                var message = mapper.readValue(jsonMsg, Message.class);
+                var message = toObject(jsonMsg, new TypeReference<Message<UniqueBody>>() {
+                });
 
                 assertThat(message).isEqualTo(messageWithUniqueBody(0, "1", "3", body -> body
                         .withType("generate")
