@@ -5,6 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.github.lipinskipawel.framework.FrameworkEchoBody;
+import com.github.lipinskipawel.framework.FrameworkEchoDeserializer;
+import com.github.lipinskipawel.framework.FrameworkEchoSerializer;
+import com.github.lipinskipawel.framework.FrameworkMessage;
+import com.github.lipinskipawel.framework.FrameworkMessageDeserializer;
+import com.github.lipinskipawel.framework.FrameworkMessageSerializer;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_ABSENT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -12,11 +18,16 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 public final class Json {
     private static final ObjectMapper mapper = configureObjectMapper();
 
-    private static ObjectMapper configureObjectMapper() {
+    public static ObjectMapper configureObjectMapper() {
         return new ObjectMapper()
                 .registerModule(new Jdk8Module())
                 .registerModule(new SimpleModule()
-                        .addDeserializer(Message.class, new MessageDeserializer()))
+                        .addDeserializer(FrameworkMessage.class, new FrameworkMessageDeserializer())
+                        .addSerializer(FrameworkMessage.class, new FrameworkMessageSerializer())
+                        .addDeserializer(Message.class, new MessageDeserializer())
+                        .addDeserializer(FrameworkEchoBody.class, new FrameworkEchoDeserializer())
+                        .addSerializer(FrameworkEchoBody.class, new FrameworkEchoSerializer())
+                )
                 .configure(FAIL_ON_UNKNOWN_PROPERTIES, true)
                 .setSerializationInclusion(NON_ABSENT);
     }

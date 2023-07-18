@@ -1,6 +1,9 @@
 package com.github.lipinskipawel;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.lipinskipawel.framework.EchoHandler;
+import com.github.lipinskipawel.framework.FrameworkEchoBody;
+import com.github.lipinskipawel.framework.FrameworkMessage;
 import com.github.lipinskipawel.protocol.InitBody;
 import com.github.lipinskipawel.protocol.Json;
 import com.github.lipinskipawel.protocol.Message;
@@ -19,6 +22,7 @@ import static com.github.lipinskipawel.protocol.Message.messageWithInitBody;
  */
 public class App {
     private static final EchoResponder echoResponder = new EchoResponder();
+    private static final EchoHandler echoHandler = new EchoHandler();
     private static final UniqueResponder uniqueResponder = new UniqueResponder();
     private static BroadcastResponder broadcastResponder;
 
@@ -35,14 +39,16 @@ public class App {
                     .withType("init_ok")
                     .withInReplyTo(1)
             ));
-            broadcastResponder = new BroadcastResponder(initMessage.body().nodeId().get(), initMessage.body().nodeIds().get());
+//            broadcastResponder = new BroadcastResponder(initMessage.body().nodeId().get(), initMessage.body().nodeIds().get());
             System.out.println(initOk);
 
             while (scanner.hasNextLine()) {
                 final var request = scanner.nextLine();
-                broadcastResponder.handle(request);
+                final var message = Json.toObject(request, new TypeReference<FrameworkMessage<FrameworkEchoBody>>() {
+                });
+                echoHandler.handle(message);
             }
-            broadcastResponder.handle("quit");
+//            broadcastResponder.handle("quit");
         }
     }
 }
