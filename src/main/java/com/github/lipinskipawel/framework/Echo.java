@@ -1,4 +1,4 @@
 package com.github.lipinskipawel.framework;
 
-public record FrameworkEchoBody(String echo) {
+public record Echo(String echo) {
 }

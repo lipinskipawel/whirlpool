@@ -6,16 +6,16 @@ import static com.github.lipinskipawel.framework.FrameworkMessage.Builder.framew
  * Run echo maelstrom workload
  * ./maelstrom test -w echo --bin whirlpool.sh --node-count 1 --time-limit 10 --log-stderr
  */
-public final class EchoHandler extends RequestHandler<FrameworkMessage<FrameworkEchoBody>> {
+public final class EchoHandler extends RequestHandler<FrameworkMessage<Echo>> {
 
     public EchoHandler() {
         super();
     }
 
     @Override
-    public void handle(FrameworkMessage<FrameworkEchoBody> request) {
+    public void handle(FrameworkMessage<Echo> request) {
         send(request.reply(frameworkMessage()
-                .withBody(new FrameworkEchoBody(request.getBody().echo()))
+                .withBody(new Echo(request.getBody().echo()))
                 .build())
         );
     }

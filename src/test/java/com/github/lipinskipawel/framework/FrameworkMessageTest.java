@@ -1,69 +1,142 @@
 package com.github.lipinskipawel.framework;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.lipinskipawel.protocol.Json;
+import com.github.lipinskipawel.framework.BuiltInBodies.Init;
 import org.assertj.core.api.WithAssertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static com.github.lipinskipawel.framework.FrameworkJson.configureObjectMapper;
+import static com.github.lipinskipawel.framework.FrameworkJson.mapper;
 import static com.github.lipinskipawel.framework.FrameworkMessage.Builder.frameworkMessage;
 
 public class FrameworkMessageTest implements WithAssertions {
 
-    @Test
-    void should_deserialize_echo_message() {
-        var json = """
-                {
-                    "id":12,
-                    "src":"1",
-                    "dest":"2",
-                    "body":{
-                        "type":"echo",
-                        "msg_id":12,
-                        "in_reply_to":19,
-                        "echo":"echo"
-                    }
-                }""";
-        final var object = Json.toObject(json, new TypeReference<FrameworkMessage<FrameworkEchoBody>>() {
-        });
+    @Nested
+    class InitTest {
+        @Test
+        void should_deserialize_init_message() throws JsonProcessingException {
+            var json = """
+                    {
+                        "id":12,
+                        "src":"c1",
+                        "dest":"n2",
+                        "body":{
+                            "type":"init",
+                            "node_id":"n0",
+                            "msg_id":10,
+                            "in_reply_to":8
+                        }
+                    }""";
 
-        assertThat(object)
-                .isInstanceOf(FrameworkMessage.class)
-                .isEqualTo(frameworkMessage()
-                        .withId(12)
-                        .withSrc("1")
-                        .withDst("2")
-                        .withBody(new FrameworkEchoBody("echo"))
-                        .withType("echo")
-                        .withMsgId(12)
-                        .withInReplyTo(19)
-                        .build());
+            final var object = mapper().readValue(json, new TypeReference<FrameworkMessage<Init>>() {
+            });
+
+            assertThat(object)
+                    .isInstanceOf(FrameworkMessage.class)
+                    .isEqualTo(frameworkMessage()
+                            .withId(12)
+                            .withSrc("c1")
+                            .withDst("n2")
+                            .withBody(new Init("n0", List.of()))
+                            .withType("init")
+                            .withMsgId(10)
+                            .withInReplyTo(8)
+                            .build());
+        }
+
+        @Test
+        void should_serialize_init_message() throws JsonProcessingException {
+            final var message = frameworkMessage()
+                    .withId(12)
+                    .withSrc("c1")
+                    .withDst("n2")
+                    .withBody(new Init())
+                    .withType("init_ok")
+                    .withMsgId(123)
+                    .withInReplyTo(191)
+                    .build();
+
+            final var json = mapper().writeValueAsString(message);
+
+            assertThat(json).isEqualTo("""
+                    {
+                        "id":12,
+                        "src":"c1",
+                        "dest":"n2",
+                        "body":{
+                            "type":"init_ok",
+                            "msg_id":123,
+                            "in_reply_to":191
+                        }
+                    }""".replaceAll("\n", "").replaceAll(" ", ""));
+        }
     }
 
-    @Test
-    void should_serialize_echo_message() {
-        final var message = frameworkMessage()
-                .withId(12)
-                .withSrc("1")
-                .withDst("2")
-                .withBody(new FrameworkEchoBody("echo"))
-                .withType("echo")
-                .withMsgId(12)
-                .withInReplyTo(19)
-                .build();
+    @Nested
+    class EchoTest {
+        @Test
+        void should_deserialize_echo_message() throws JsonProcessingException {
+            var json = """
+                    {
+                        "id":12,
+                        "src":"1",
+                        "dest":"2",
+                        "body":{
+                            "type":"echo",
+                            "msg_id":12,
+                            "in_reply_to":19,
+                            "echo":"please-echo"
+                        }
+                    }""";
 
-        final var json = Json.toJson(message);
+            final var mapper = configureObjectMapper(Echo.class, new FrameworkEchoDeserializer(), new FrameworkEchoSerializer());
+            final var object = mapper.readValue(json, new TypeReference<FrameworkMessage<Echo>>() {
+            });
 
-        assertThat(json).isEqualTo("""
-                {
-                    "id":12,
-                    "src":"1",
-                    "dest":"2",
-                    "body":{
-                        "type":"echo",
-                        "msg_id":12,
-                        "in_reply_to":19,
-                        "echo":"echo"
-                    }
-                }""".replaceAll("\n", "").replaceAll(" ", ""));
+            assertThat(object)
+                    .isInstanceOf(FrameworkMessage.class)
+                    .isEqualTo(frameworkMessage()
+                            .withId(12)
+                            .withSrc("1")
+                            .withDst("2")
+                            .withBody(new Echo("please-echo"))
+                            .withType("echo")
+                            .withMsgId(12)
+                            .withInReplyTo(19)
+                            .build());
+        }
+
+        @Test
+        void should_serialize_echo_message() throws JsonProcessingException {
+            final var message = frameworkMessage()
+                    .withId(12)
+                    .withSrc("1")
+                    .withDst("2")
+                    .withBody(new Echo("please-echo"))
+                    .withType("echo_ok")
+                    .withMsgId(12)
+                    .withInReplyTo(19)
+                    .build();
+
+            final var mapper = configureObjectMapper(Echo.class, new FrameworkEchoDeserializer(), new FrameworkEchoSerializer());
+            final var json = mapper.writeValueAsString(message);
+
+            assertThat(json).isEqualTo("""
+                    {
+                        "id":12,
+                        "src":"1",
+                        "dest":"2",
+                        "body":{
+                            "type":"echo_ok",
+                            "msg_id":12,
+                            "in_reply_to":19,
+                            "echo":"please-echo"
+                        }
+                    }""".replaceAll("\n", "").replaceAll(" ", ""));
+        }
     }
 }

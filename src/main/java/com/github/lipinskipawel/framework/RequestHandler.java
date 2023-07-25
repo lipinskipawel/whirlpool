@@ -1,6 +1,6 @@
 package com.github.lipinskipawel.framework;
 
-import static com.github.lipinskipawel.protocol.Json.toJson;
+import static com.github.lipinskipawel.framework.FrameworkJson.toJson;
 
 public abstract class RequestHandler<M extends FrameworkMessage<?>> {
 

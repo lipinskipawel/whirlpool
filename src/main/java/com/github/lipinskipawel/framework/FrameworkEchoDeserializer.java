@@ -7,20 +7,15 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
 
-import static com.github.lipinskipawel.protocol.Json.configureObjectMapper;
-
-public class FrameworkEchoDeserializer extends StdDeserializer<FrameworkEchoBody> {
+public class FrameworkEchoDeserializer extends StdDeserializer<Echo> {
 
     public FrameworkEchoDeserializer() {
-        super(FrameworkEchoBody.class);
+        super(Echo.class);
     }
 
     @Override
-    public FrameworkEchoBody deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        p.setCodec(configureObjectMapper());
+    public Echo deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         final JsonNode tree = p.getCodec().readTree(p);
-
-        final var echo = tree.get("echo").asText();
-        return new FrameworkEchoBody(echo);
+        return new Echo(tree.get("echo").asText());
     }
 }

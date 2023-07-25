@@ -42,7 +42,7 @@ public class FrameworkMessageDeserializer extends StdDeserializer<FrameworkMessa
         final var dst = tree.get("dest").asText();
         final var bodyNode = tree.get("body");
         final var contextualValueDeserializer = ctxt.findContextualValueDeserializer(javaType.containedType(0), beanProperty);
-        final var object = contextualValueDeserializer.deserialize(bodyNode.traverse(), ctxt);
+        final var object = contextualValueDeserializer.deserialize(bodyNode.traverse(p.getCodec()), ctxt);
 
         final var type = bodyNode.get("type").asText();
         final var msgId = ofNullable(bodyNode.get("msg_id")).map(JsonNode::asInt);
