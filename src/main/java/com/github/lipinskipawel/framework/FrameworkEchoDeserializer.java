@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
 
+import static com.github.lipinskipawel.framework.BuiltInBodies.Echo;
+
 public class FrameworkEchoDeserializer extends StdDeserializer<Echo> {
 
     public FrameworkEchoDeserializer() {

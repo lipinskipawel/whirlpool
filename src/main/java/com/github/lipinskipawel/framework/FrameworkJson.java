@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.github.lipinskipawel.framework.BuiltInBodies.Echo;
 import com.github.lipinskipawel.framework.BuiltInBodies.Init;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_ABSENT;
@@ -19,7 +20,9 @@ public final class FrameworkJson {
             .addDeserializer(FrameworkMessage.class, new FrameworkMessageDeserializer())
             .addSerializer(FrameworkMessage.class, new FrameworkMessageSerializer())
             .addDeserializer(Init.class, new FrameworkInitDeserializer())
-            .addSerializer(Init.class, new FrameworkInitSerializer());
+            .addSerializer(Init.class, new FrameworkInitSerializer())
+            .addDeserializer(Echo.class, new FrameworkEchoDeserializer())
+            .addSerializer(Echo.class, new FrameworkEchoSerializer());
 
     private static final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new Jdk8Module())

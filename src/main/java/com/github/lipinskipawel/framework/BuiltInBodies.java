@@ -9,4 +9,7 @@ public final class BuiltInBodies {
             this("", List.of());
         }
     }
+
+    public record Echo(String echo) {
+    }
 }

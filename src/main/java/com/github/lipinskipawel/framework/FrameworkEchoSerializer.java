@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 
+import static com.github.lipinskipawel.framework.BuiltInBodies.Echo;
+
 public class FrameworkEchoSerializer extends StdSerializer<Echo> {
 
     public FrameworkEchoSerializer() {

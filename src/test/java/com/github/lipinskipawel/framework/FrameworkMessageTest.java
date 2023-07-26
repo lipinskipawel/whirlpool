@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static com.github.lipinskipawel.framework.BuiltInBodies.Echo;
 import static com.github.lipinskipawel.framework.FrameworkJson.configureObjectMapper;
 import static com.github.lipinskipawel.framework.FrameworkJson.mapper;
 import static com.github.lipinskipawel.framework.FrameworkMessage.Builder.frameworkMessage;

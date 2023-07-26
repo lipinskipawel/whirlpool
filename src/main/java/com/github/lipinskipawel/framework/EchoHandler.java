@@ -1,5 +1,6 @@
 package com.github.lipinskipawel.framework;
 
+import static com.github.lipinskipawel.framework.BuiltInBodies.Echo;
 import static com.github.lipinskipawel.framework.FrameworkMessage.Builder.frameworkMessage;
 
 /**
