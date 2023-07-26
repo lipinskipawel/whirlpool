@@ -14,9 +14,9 @@ public final class EchoHandler extends RequestHandler<FrameworkMessage<Echo>> {
     }
 
     @Override
-    public void handle(FrameworkMessage<Echo> request) {
-        send(request.reply(frameworkMessage()
-                .withBody(new Echo(request.getBody().echo()))
+    public void handle(FrameworkMessage<Echo> message) {
+        send(message.reply(frameworkMessage()
+                .withBody(new Echo(message.getBody().echo()))
                 .build())
         );
     }

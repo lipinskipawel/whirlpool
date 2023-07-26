@@ -10,7 +10,7 @@ public abstract class RequestHandler<M extends FrameworkMessage<?>> {
         this.msgCounter = 0;
     }
 
-    public abstract void handle(M msg);
+    public abstract void handle(M message);
 
     @SuppressWarnings("unchecked")
     public void send(M object) {

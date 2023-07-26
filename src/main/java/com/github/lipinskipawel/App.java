@@ -1,10 +1,10 @@
 package com.github.lipinskipawel;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.lipinskipawel.framework.EchoHandler;
-import com.github.lipinskipawel.framework.FrameworkEchoDeserializer;
-import com.github.lipinskipawel.framework.FrameworkEchoSerializer;
 import com.github.lipinskipawel.framework.FrameworkEntryPoint;
+import com.github.lipinskipawel.framework.FrameworkUniqueDeserializer;
+import com.github.lipinskipawel.framework.FrameworkUniqueSerializer;
+import com.github.lipinskipawel.framework.UniqueHandler;
 import com.github.lipinskipawel.protocol.InitBody;
 import com.github.lipinskipawel.protocol.Json;
 import com.github.lipinskipawel.protocol.Message;
@@ -27,7 +27,7 @@ public class App {
     private static BroadcastResponder broadcastResponder;
 
     public static void main(String[] args) {
-        FrameworkEntryPoint.register(new EchoHandler(), new FrameworkEchoDeserializer(), new FrameworkEchoSerializer())
+        FrameworkEntryPoint.register(new UniqueHandler(), new FrameworkUniqueDeserializer(), new FrameworkUniqueSerializer())
                 .start();
 //        parse(System.in);
     }
