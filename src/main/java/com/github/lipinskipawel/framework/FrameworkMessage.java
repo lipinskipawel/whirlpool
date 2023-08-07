@@ -1,5 +1,10 @@
 package com.github.lipinskipawel.framework;
 
+import com.github.lipinskipawel.framework.BuiltInBodies.Read;
+import com.github.lipinskipawel.framework.BuiltInBodies.Topology;
+import com.github.lipinskipawel.protocol.TopologyBody;
+
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -32,18 +37,9 @@ public final class FrameworkMessage<T> {
         final var builder = replyMessage.copy()
                 .withSrc(dst)
                 .withDst(src)
-                .withType(convertType(this))
+                .withType(this.getType() + "_ok")
                 .withInReplyTo(msgId.or(() -> replyMessage.msgId).orElse(1));
         return builder.build();
-    }
-
-    private String convertType(FrameworkMessage<T> message) {
-        return switch (message.getType()) {
-            case "init" -> "init_ok";
-            case "echo" -> "echo_ok";
-            case "generate" -> "generate_ok";
-            default -> throw new RuntimeException("Not supported type %s" + message.getType());
-        };
     }
 
     FrameworkMessage.Builder<?> copy() {
@@ -56,6 +52,30 @@ public final class FrameworkMessage<T> {
         msgId.ifPresent(builder::withMsgId);
         inReplyTo.ifPresent(builder::withInReplyTo);
         return builder;
+    }
+
+    public static FrameworkMessage<TopologyBody> replyToTopology(FrameworkMessage<?> original) {
+        return frameworkMessage()
+                .withId(original.getId())
+                .withSrc(original.getDst())
+                .withDst(original.getSrc())
+                .withBody(new Topology())
+                .withType(original.getType() + "_ok")
+                .withMsgId(original.getMsgId().map(it -> it + 1).orElse(0))
+                .withInReplyTo(original.getMsgId().orElse(0))
+                .build();
+    }
+
+    public static FrameworkMessage<TopologyBody> replyToRead(FrameworkMessage<?> original, List<Integer> messages) {
+        return frameworkMessage()
+                .withId(original.getId())
+                .withSrc(original.getDst())
+                .withDst(original.getSrc())
+                .withBody(new Read(messages))
+                .withType(original.getType() + "_ok")
+                .withMsgId(original.getMsgId().map(it -> it + 1).orElse(0))
+                .withInReplyTo(original.getMsgId().orElse(0))
+                .build();
     }
 
     int getId() {

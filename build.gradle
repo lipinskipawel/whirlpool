@@ -30,6 +30,10 @@ shadowJar {
     archiveFileName = project.name + ".jar"
 }
 
+compileJava {
+    options.compilerArgs << '-Xdiags:verbose'
+}
+
 test {
     useJUnitPlatform()
 }

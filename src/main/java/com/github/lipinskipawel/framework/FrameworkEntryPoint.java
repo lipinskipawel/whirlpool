@@ -43,6 +43,7 @@ public final class FrameworkEntryPoint<T> {
             final var initOk = initMessage.reply(frameworkMessage()
                     .withBody(new Init())
                     .build());
+            handler.init(initMessage.getBody().nodeId(), initMessage.getBody().nodeIds());
             System.out.println(toJson(initOk));
 
             while (scanner.hasNextLine()) {
@@ -51,6 +52,7 @@ public final class FrameworkEntryPoint<T> {
                 final FrameworkMessage<T> message = toObject(request, javaType);
                 handler.handle(message);
             }
+            handler.quit();
         }
     }
 }

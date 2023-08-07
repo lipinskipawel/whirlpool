@@ -1,5 +1,7 @@
 package com.github.lipinskipawel.framework;
 
+import java.util.List;
+
 import static com.github.lipinskipawel.framework.BuiltInBodies.Echo;
 import static com.github.lipinskipawel.framework.FrameworkMessage.Builder.frameworkMessage;
 
@@ -19,5 +21,13 @@ public final class EchoHandler extends RequestHandler<FrameworkMessage<Echo>> {
                 .withBody(new Echo(message.getBody().echo()))
                 .build())
         );
+    }
+
+    @Override
+    public void init(String nodeId, List<String> nodesIds) {
+    }
+
+    @Override
+    public void quit() {
     }
 }

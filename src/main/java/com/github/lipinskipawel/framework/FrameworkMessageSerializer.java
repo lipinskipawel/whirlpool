@@ -3,6 +3,8 @@ package com.github.lipinskipawel.framework;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.github.lipinskipawel.framework.BuiltInBodies.Read;
+import com.github.lipinskipawel.framework.BuiltInBodies.Topology;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -33,9 +35,20 @@ public class FrameworkMessageSerializer extends StdSerializer<FrameworkMessage> 
         gen.writeStringField("type", type);
         msgId.ifPresent(it -> wrapWithCatch(gen, it, "msg_id"));
         inReplyTo.ifPresent(it -> wrapWithCatch(gen, it, "in_reply_to"));
-        gen.writeObject(body);
+        if (isNotTopologyAndRead(body)) {
+            gen.writeObject(body);
+        }
+        if (body instanceof Read read) {
+            gen.writeFieldName("messages");
+            gen.writeArray(read.messages().stream().mapToInt(it -> it).toArray(), 0, read.messages().size());
+        }
         gen.writeEndObject();
         gen.writeEndObject();
+    }
+
+    private boolean isNotTopologyAndRead(Object body) {
+        return !(body instanceof Topology) &&
+                !(body instanceof Read);
     }
 
     private void wrapWithCatch(JsonGenerator gen, Integer msgId, String fieldName) {
