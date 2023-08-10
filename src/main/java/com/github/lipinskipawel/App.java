@@ -3,10 +3,7 @@ package com.github.lipinskipawel;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.lipinskipawel.framework2.Register;
-import com.github.lipinskipawel.framework2.protocol.Echo;
-import com.github.lipinskipawel.framework2.protocol.EchoOk;
-import com.github.lipinskipawel.framework2.protocol.Init;
-import com.github.lipinskipawel.framework2.protocol.InitOk;
+import com.github.lipinskipawel.framework2.protocol.Internal;
 import com.github.lipinskipawel.protocol.InitBody;
 import com.github.lipinskipawel.protocol.Json;
 import com.github.lipinskipawel.protocol.Message;
@@ -28,12 +25,9 @@ public class App {
     private static final UniqueResponder uniqueResponder = new UniqueResponder();
     private static BroadcastResponder broadcastResponder;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         final var register = new Register();
-        Register.configure("init", TypeFactory.defaultInstance().constructFromCanonical(Init.class.getCanonicalName()));
-        Register.configure("init_ok", TypeFactory.defaultInstance().constructFromCanonical(InitOk.class.getCanonicalName()));
-        Register.configure("echo", TypeFactory.defaultInstance().constructFromCanonical(Echo.class.getCanonicalName()));
-        Register.configure("echo_ok", TypeFactory.defaultInstance().constructFromCanonical(EchoOk.class.getCanonicalName()));
+        Register.configure("internal", TypeFactory.defaultInstance().constructFromCanonical(Internal.class.getCanonicalName()));
         register.loop();
 //        FrameworkEntryPoint.register(new BroadcastHandler(), new FrameworkBroadcastDeserializer(), new FrameworkBroadcastSerializer())
 //                .start();
