@@ -1,9 +1,8 @@
 package com.github.lipinskipawel;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.github.lipinskipawel.framework2.Register;
-import com.github.lipinskipawel.framework2.protocol.Internal;
+import com.github.lipinskipawel.framework1.Internal;
+import com.github.lipinskipawel.framework1.Server;
 import com.github.lipinskipawel.protocol.InitBody;
 import com.github.lipinskipawel.protocol.Json;
 import com.github.lipinskipawel.protocol.Message;
@@ -26,9 +25,12 @@ public class App {
     private static BroadcastResponder broadcastResponder;
 
     public static void main(String[] args) throws InterruptedException {
-        final var register = new Register();
-        Register.configure("internal", TypeFactory.defaultInstance().constructFromCanonical(Internal.class.getCanonicalName()));
-        register.loop();
+        Server.addCustomEvent("internal", Internal.class);
+        final var server = new Server();
+        server.loop();
+//        final var register = new Register();
+//        Register.configure("internal", TypeFactory.defaultInstance().constructFromCanonical(Internal.class.getCanonicalName()));
+//        register.loop();
 //        FrameworkEntryPoint.register(new BroadcastHandler(), new FrameworkBroadcastDeserializer(), new FrameworkBroadcastSerializer())
 //                .start();
 //        parse(System.in);
