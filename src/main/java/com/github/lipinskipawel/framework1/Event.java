@@ -1,10 +1,12 @@
 package com.github.lipinskipawel.framework1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.lipinskipawel.base.BaseWorkload;
+import com.github.lipinskipawel.base.EventType;
 
 import java.util.Objects;
 
-public final class Event<T> {
+public final class Event<T extends BaseWorkload> {
     @JsonProperty("id")
     public int id;
     @JsonProperty("src")
@@ -14,11 +16,29 @@ public final class Event<T> {
     @JsonProperty("body")
     public T body;
 
-    public Event() {
+    Event(T body) {
+        this.body = body;
     }
 
-    public Event(T body) {
+    private Event(int id, String src, String dest, T body) {
+        this.id = id;
+        this.src = src;
+        this.dst = dest;
         this.body = body;
+    }
+
+    public static <T extends BaseWorkload> Event<T> createEvent(int id, String src, String dest, T body) {
+        return new Event<>(id, src, dest, body);
+    }
+
+    <E extends EventType> Event<E> reply(E body) {
+        final var response = new Event<>(body);
+        response.id = this.id;
+        response.src = this.dst;
+        response.dst = this.src;
+        response.body.inReplyTo = this.body.msgId();
+        response.body.msgId = this.body.msgId() + 1;
+        return response;
     }
 
     @Override

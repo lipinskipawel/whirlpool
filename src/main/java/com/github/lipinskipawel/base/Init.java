@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Objects;
 
-public final class Init extends EventType implements InitWorkload, EchoWorkload, BroadcastWorkload {
+public final class Init extends EventType implements EchoWorkload, BroadcastWorkload {
     @JsonProperty("node_id")
     public String nodeId;
     @JsonProperty("node_ids")

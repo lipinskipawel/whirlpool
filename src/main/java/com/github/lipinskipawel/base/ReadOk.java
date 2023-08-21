@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Objects;
 
-public final class ReadOk extends EventType implements BroadcastWorkload {
+public final class ReadOk extends EventType {
     @JsonProperty("messages")
     public List<Integer> messages;
 

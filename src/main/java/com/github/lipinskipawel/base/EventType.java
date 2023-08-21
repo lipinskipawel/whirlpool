@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public abstract class EventType {
+public non-sealed class EventType implements BaseWorkload {
     public String type;
     @JsonProperty("msg_id")
     public int msgId;
@@ -13,6 +13,16 @@ public abstract class EventType {
 
     protected EventType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public int msgId() {
+        return msgId;
+    }
+
+    @Override
+    public int inReplyTo() {
+        return inReplyTo;
     }
 
     @Override

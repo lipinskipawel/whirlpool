@@ -23,12 +23,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import static com.github.lipinskipawel.framework1.Server.writeRequest;
+import static com.github.lipinskipawel.framework1.Event.createEvent;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.function.Predicate.not;
 
-final class BroadcastHandler {
+final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
     private final AtomicReference<String> nodeId;
     private List<String> reachableNodes;
     private final Set<Integer> messages;
@@ -46,47 +46,28 @@ final class BroadcastHandler {
         this.random = ThreadLocalRandom.current();
     }
 
-    void handle(Event<?> event) throws InterruptedException {
-        final var body = (BroadcastWorkload) event.body;
+    @Override
+    public void handle(Event<BroadcastWorkload> event) {
+        final var body = event.body;
         if (body instanceof Init init) {
             this.nodeId.set(init.nodeId);
             this.reachableNodes.addAll(init.nodeIds.stream().filter(not(it -> it.equals(nodeId.get()))).toList());
-            final var response = new Event<>(new InitOk());
-            response.src = event.dst;
-            response.dst = event.src;
-            response.body.msgId = 1;
-            response.body.inReplyTo = init.msgId;
-            System.out.println(writeRequest(response));
+            replyAndSend(event, new InitOk());
             return;
         }
         if (body instanceof Broadcast broadcast) {
             this.messages.add(broadcast.message);
-            final var response = new Event<>(new BroadcastOk());
-            response.src = event.dst;
-            response.dst = event.src;
-            response.body.msgId = broadcast.msgId + 1;
-            response.body.inReplyTo = broadcast.msgId;
-            System.out.println(writeRequest(response));
+            replyAndSend(event, new BroadcastOk());
             return;
         }
-        if (body instanceof Read read) {
-            final var response = new Event<>(new ReadOk(this.messages.stream().toList()));
-            response.src = event.dst;
-            response.dst = event.src;
-            response.body.msgId = read.msgId + 1;
-            response.body.inReplyTo = read.msgId;
-            System.out.println(writeRequest(response));
+        if (body instanceof Read) {
+            replyAndSend(event, new ReadOk(this.messages.stream().toList()));
             return;
         }
         if (body instanceof Topology topology) {
             this.reachableNodes = new CopyOnWriteArrayList<>(topology.topology.get(this.nodeId.get()));
             this.reachableNodes.forEach(it -> this.known.put(it, new CopyOnWriteArraySet<>()));
-            final var response = new Event<>(new TopologyOk());
-            response.src = event.dst;
-            response.dst = event.src;
-            response.body.msgId = topology.msgId + 1;
-            response.body.inReplyTo = topology.msgId;
-            System.out.println(writeRequest(response));
+            replyAndSend(event, new TopologyOk());
             return;
         }
         if (body instanceof CustomRequest customRequest) {
@@ -100,9 +81,14 @@ final class BroadcastHandler {
             }
         }
         if (body instanceof Quit) {
-            Thread.sleep(900);
-            this.schedule.shutdownNow();
-            this.schedule.awaitTermination(500, MILLISECONDS);
+            try {
+                Thread.sleep(900);
+                this.schedule.shutdownNow();
+                this.schedule.awaitTermination(500, MILLISECONDS);
+            } catch (InterruptedException e) {
+                System.err.println("Exception during shutdown of: " + getClass());
+                System.err.println(e);
+            }
         }
     }
 
@@ -115,14 +101,10 @@ final class BroadcastHandler {
                             .filter(not(message -> this.known.get(it).contains(message)))
                             .toList();
                     final var extended = extendedByKnownMessage(it, toSend);
-                    final var event = new Event<>(new Internal(extended));
-                    event.src = nodeId.get();
-                    event.dst = it;
-                    return event;
+                    return createEvent(0, nodeId.get(), it, new Internal(extended));
                 })
                 .filter(not(it -> it.body.messagesFromOtherNode.size() == 0))
-                .map(Server::writeRequest)
-                .forEach(System.out::println);
+                .forEach(this::send);
     }
 
     private List<Integer> extendedByKnownMessage(String nodeId, List<Integer> toSend) {

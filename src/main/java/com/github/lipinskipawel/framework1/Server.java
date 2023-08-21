@@ -3,10 +3,12 @@ package com.github.lipinskipawel.framework1;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.github.lipinskipawel.base.BaseWorkload;
 import com.github.lipinskipawel.base.Broadcast;
 import com.github.lipinskipawel.base.BroadcastOk;
 import com.github.lipinskipawel.base.Echo;
 import com.github.lipinskipawel.base.EchoOk;
+import com.github.lipinskipawel.base.EventType;
 import com.github.lipinskipawel.base.Init;
 import com.github.lipinskipawel.base.InitOk;
 import com.github.lipinskipawel.base.Quit;
@@ -20,14 +22,14 @@ import java.util.Map;
 import java.util.Scanner;
 
 public final class Server {
-    public static final Map<String, Class<?>> POSSIBLE_TYPES = createMappings();
+    static final Map<String, Class<? extends EventType>> POSSIBLE_TYPES = createMappings();
     private static final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new SimpleModule()
                     .addDeserializer(Event.class, new EventDeserializer()));
     private final BroadcastHandler handler = new BroadcastHandler();
 
-    private static Map<String, Class<?>> createMappings() {
-        final var mappings = new HashMap<String, Class<?>>();
+    private static Map<String, Class<? extends EventType>> createMappings() {
+        final var mappings = new HashMap<String, Class<? extends EventType>>();
         mappings.put("init", Init.class);
         mappings.put("init_ok", InitOk.class);
         mappings.put("quit", Quit.class);
@@ -42,11 +44,12 @@ public final class Server {
         return mappings;
     }
 
-    public static void addCustomEvent(String eventType, Class<?> eventClass) {
+    public static void addCustomEvent(String eventType, Class<? extends EventType> eventClass) {
         POSSIBLE_TYPES.put(eventType, eventClass);
     }
 
-    public void loop() throws InterruptedException {
+    @SuppressWarnings("unchecked")
+    public void loop() {
         try (var scanner = new Scanner(System.in)) {
 
             final var initRequest = scanner.nextLine();
@@ -56,11 +59,17 @@ public final class Server {
                 final var request = scanner.nextLine();
                 handler.handle(readRequest(request));
             }
-            handler.handle(new Event<>(new Quit()));
+            handler.handle(createQuitEvent());
         }
     }
 
-    public static Event<?> readRequest(String request) {
+    @SuppressWarnings("rawtypes")
+    static Event createQuitEvent() {
+        return new Event<>(new Quit());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends BaseWorkload> Event<T> readRequest(String request) {
         try {
             return mapper.readValue(request, Event.class);
         } catch (JsonProcessingException e) {

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.github.lipinskipawel.base.Echo;
 import com.github.lipinskipawel.base.EchoOk;
 import com.github.lipinskipawel.base.EchoWorkload;
+import com.github.lipinskipawel.base.EventType;
 import com.github.lipinskipawel.base.Init;
 import com.github.lipinskipawel.base.InitOk;
 import org.assertj.core.api.WithAssertions;
@@ -23,11 +24,10 @@ class EventDeserializerTest implements WithAssertions {
 
     @Test
     void should_serialize_event() throws JsonProcessingException {
-        var event = new Event<>();
+        var event = new Event<>(new InitOk());
         event.id = 1;
         event.src = "c2";
         event.dst = "n0";
-        event.body = new InitOk();
 
         var json = mapper.writeValueAsString(event);
 
@@ -59,11 +59,10 @@ class EventDeserializerTest implements WithAssertions {
 
         var event = mapper.readValue(json, Event.class);
 
-        var expected = new Event<>();
+        var expected = new Event<>(new EchoOk("please-echo"));
         expected.id = 1;
         expected.src = "c2";
         expected.dst = "n0";
-        expected.body = new EchoOk("please-echo");
         assertThat(event)
                 .isInstanceOf(Event.class)
                 .isEqualTo(expected);
@@ -84,11 +83,10 @@ class EventDeserializerTest implements WithAssertions {
 
         var event = mapper.readValue(json, Event.class);
 
-        var expected = new Event<>();
+        var expected = new Event<>((EchoOk) event.body);
         expected.id = 1;
         expected.src = "c2";
         expected.dst = "n0";
-        expected.body = (EchoOk) event.body;
         assertThat(event)
                 .isInstanceOf(Event.class)
                 .isEqualTo(expected);
@@ -110,11 +108,10 @@ class EventDeserializerTest implements WithAssertions {
         var event = mapper.readValue(json, new TypeReference<Event<EchoOk>>() {
         });
 
-        var expected = new Event<>();
+        var expected = new Event<>(new EchoOk("please-echo"));
         expected.id = 1;
         expected.src = "c2";
         expected.dst = "n0";
-        expected.body = new EchoOk("please-echo");
         assertThat(event)
                 .isInstanceOf(Event.class)
                 .isEqualTo(expected);
@@ -135,22 +132,18 @@ class EventDeserializerTest implements WithAssertions {
 
         var event = mapper.readValue(json, Event.class);
 
-        EchoWorkload echoBody = (EchoWorkload) event.body;
+        EventType echoBody = (EventType) event.body;
         if (echoBody instanceof Init) {
             fail("it is not a init event");
-        }
-        if (echoBody instanceof InitOk) {
-            fail("it is not a init_ok event");
         }
         if (echoBody instanceof Echo) {
             fail("it is not a echo event");
         }
 
-        var expected = new Event<>();
+        var expected = new Event<>(new EchoOk("please-echo"));
         expected.id = 1;
         expected.src = "c2";
         expected.dst = "n0";
-        expected.body = new EchoOk("please-echo");
         assertThat(event)
                 .isInstanceOf(Event.class)
                 .isEqualTo(expected);

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public final class EchoOk extends EventType implements EchoWorkload {
+public final class EchoOk extends EventType {
     @JsonProperty("echo")
     public String echo;
 

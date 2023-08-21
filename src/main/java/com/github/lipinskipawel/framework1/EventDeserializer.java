@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.lipinskipawel.base.EventType;
 
 import java.io.IOException;
 
@@ -23,7 +24,7 @@ final class EventDeserializer extends JsonDeserializer<Event<?>> {
         final var dst = tree.get("dest").asText();
         final var bodyNode = tree.get("body");
         final var intoType = POSSIBLE_TYPES.get(bodyNode.get("type").asText());
-        final var object = bodyNode.traverse(p.getCodec()).readValueAs(intoType);
+        final var object = (EventType) bodyNode.traverse(p.getCodec()).readValueAs(intoType);
 
         final var event = new Event<>(object);
         event.id = id;

@@ -24,7 +24,7 @@ public class App {
     private static final UniqueResponder uniqueResponder = new UniqueResponder();
     private static BroadcastResponder broadcastResponder;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         Server.addCustomEvent("internal", Internal.class);
         final var server = new Server();
         server.loop();
