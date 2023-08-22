@@ -16,6 +16,8 @@ import com.github.lipinskipawel.base.Read;
 import com.github.lipinskipawel.base.ReadOk;
 import com.github.lipinskipawel.base.Topology;
 import com.github.lipinskipawel.base.TopologyOk;
+import com.github.lipinskipawel.base.Unique;
+import com.github.lipinskipawel.base.UniqueOk;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,8 @@ public final class Server {
         mappings.put("quit", Quit.class);
         mappings.put("echo", Echo.class);
         mappings.put("echo_ok", EchoOk.class);
+        mappings.put("generate", Unique.class);
+        mappings.put("generate_ok", UniqueOk.class);
         mappings.put("broadcast", Broadcast.class);
         mappings.put("broadcast_ok", BroadcastOk.class);
         mappings.put("read", Read.class);

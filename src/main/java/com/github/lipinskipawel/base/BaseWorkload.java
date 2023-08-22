@@ -1,7 +1,7 @@
 package com.github.lipinskipawel.base;
 
 public sealed interface BaseWorkload permits EventType,
-        EchoWorkload, BroadcastWorkload {
+        EchoWorkload, UniqueWorkload, BroadcastWorkload {
 
     int msgId();
 
