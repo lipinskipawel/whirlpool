@@ -1,35 +1,29 @@
 package com.github.lipinskipawel.framework1;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.github.lipinskipawel.base.Echo;
 import com.github.lipinskipawel.base.EchoOk;
-import com.github.lipinskipawel.base.EchoWorkload;
 import com.github.lipinskipawel.base.EventType;
 import com.github.lipinskipawel.base.Init;
 import com.github.lipinskipawel.base.InitOk;
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
+import static com.github.lipinskipawel.framework1.JsonSupport.writeRequest;
+
 class EventDeserializerTest implements WithAssertions {
 
-    private final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new Jdk8Module())
-            .registerModule(new SimpleModule()
-                    .addDeserializer(Event.class, new EventDeserializer())
-            );
+    private final JsonSupport mapper = new JsonSupport(Map.of());
 
     @Test
-    void should_serialize_event() throws JsonProcessingException {
+    void should_serialize_event() {
         var event = new Event<>(new InitOk());
         event.id = 1;
         event.src = "c2";
         event.dst = "n0";
 
-        var json = mapper.writeValueAsString(event);
+        var json = writeRequest(event);
 
         assertThat(json).isEqualTo("""
                 {
@@ -45,7 +39,7 @@ class EventDeserializerTest implements WithAssertions {
     }
 
     @Test
-    void should_deserialize_event() throws JsonProcessingException {
+    void should_deserialize_event() {
         var json = """
                 {
                     "id": 1,
@@ -57,7 +51,7 @@ class EventDeserializerTest implements WithAssertions {
                     }
                 }""";
 
-        var event = mapper.readValue(json, Event.class);
+        var event = mapper.readRequest(json);
 
         var expected = new Event<>(new EchoOk("please-echo"));
         expected.id = 1;
@@ -69,7 +63,7 @@ class EventDeserializerTest implements WithAssertions {
     }
 
     @Test
-    void should_deserialize_event_with_cast() throws JsonProcessingException {
+    void should_deserialize_event_with_cast() {
         var json = """
                 {
                     "id": 1,
@@ -81,7 +75,7 @@ class EventDeserializerTest implements WithAssertions {
                     }
                 }""";
 
-        var event = mapper.readValue(json, Event.class);
+        var event = mapper.readRequest(json);
 
         var expected = new Event<>((EchoOk) event.body);
         expected.id = 1;
@@ -93,7 +87,7 @@ class EventDeserializerTest implements WithAssertions {
     }
 
     @Test
-    void should_deserialize_event_with_type_reference() throws JsonProcessingException {
+    void should_deserialize_event_with_type_reference() {
         var json = """
                 {
                     "id": 1,
@@ -105,8 +99,7 @@ class EventDeserializerTest implements WithAssertions {
                     }
                 }""";
 
-        var event = mapper.readValue(json, new TypeReference<Event<EchoOk>>() {
-        });
+        var event = mapper.readRequest(json);
 
         var expected = new Event<>(new EchoOk("please-echo"));
         expected.id = 1;
@@ -118,7 +111,7 @@ class EventDeserializerTest implements WithAssertions {
     }
 
     @Test
-    void should_deserialize_event_with_instance_of() throws JsonProcessingException {
+    void should_deserialize_event_with_instance_of() {
         var json = """
                 {
                     "id": 1,
@@ -130,7 +123,7 @@ class EventDeserializerTest implements WithAssertions {
                     }
                 }""";
 
-        var event = mapper.readValue(json, Event.class);
+        var event = mapper.readRequest(json);
 
         EventType echoBody = (EventType) event.body;
         if (echoBody instanceof Init) {

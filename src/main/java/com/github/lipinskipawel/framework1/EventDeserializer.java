@@ -7,12 +7,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.lipinskipawel.base.EventType;
 
 import java.io.IOException;
-
-import static com.github.lipinskipawel.framework1.Server.POSSIBLE_TYPES;
+import java.util.Map;
 
 final class EventDeserializer extends JsonDeserializer<Event<?>> {
+    private final Map<String, Class<? extends EventType>> supportedTypes;
 
-    public EventDeserializer() {
+    public EventDeserializer(Map<String, Class<? extends EventType>> supportedTypes) {
+        this.supportedTypes = supportedTypes;
     }
 
     @Override
@@ -23,7 +24,7 @@ final class EventDeserializer extends JsonDeserializer<Event<?>> {
         final var src = tree.get("src").asText();
         final var dst = tree.get("dest").asText();
         final var bodyNode = tree.get("body");
-        final var intoType = POSSIBLE_TYPES.get(bodyNode.get("type").asText());
+        final var intoType = supportedTypes.get(bodyNode.get("type").asText());
         final var object = (EventType) bodyNode.traverse(p.getCodec()).readValueAs(intoType);
 
         final var event = new Event<>(object);

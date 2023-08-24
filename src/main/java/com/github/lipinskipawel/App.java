@@ -1,8 +1,8 @@
 package com.github.lipinskipawel;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.lipinskipawel.framework1.BroadcastHandler;
 import com.github.lipinskipawel.framework1.Internal;
-import com.github.lipinskipawel.framework1.Server;
 import com.github.lipinskipawel.protocol.InitBody;
 import com.github.lipinskipawel.protocol.Json;
 import com.github.lipinskipawel.protocol.Message;
@@ -11,8 +11,10 @@ import com.github.lipinskipawel.workload.EchoResponder;
 import com.github.lipinskipawel.workload.UniqueResponder;
 
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Scanner;
 
+import static com.github.lipinskipawel.framework1.Server.workloadWithCustomEvent;
 import static com.github.lipinskipawel.protocol.Message.messageWithInitBody;
 
 /**
@@ -25,9 +27,8 @@ public class App {
     private static BroadcastResponder broadcastResponder;
 
     public static void main(String[] args) {
-        Server.addCustomEvent("internal", Internal.class);
-        final var server = new Server();
-        server.loop();
+        workloadWithCustomEvent(new BroadcastHandler(), Map.of("internal", Internal.class))
+                .loop();
 //        final var register = new Register();
 //        Register.configure("internal", TypeFactory.defaultInstance().constructFromCanonical(Internal.class.getCanonicalName()));
 //        register.loop();

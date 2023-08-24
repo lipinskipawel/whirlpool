@@ -28,7 +28,7 @@ import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.function.Predicate.not;
 
-final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
+public final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
     private final AtomicReference<String> nodeId;
     private List<String> reachableNodes;
     private final Set<Integer> messages;
@@ -36,7 +36,7 @@ final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
     private final ScheduledExecutorService schedule;
     private final ThreadLocalRandom random;
 
-    BroadcastHandler() {
+    public BroadcastHandler() {
         this.nodeId = new AtomicReference<>();
         this.reachableNodes = new CopyOnWriteArrayList<>();
         this.messages = new CopyOnWriteArraySet<>();

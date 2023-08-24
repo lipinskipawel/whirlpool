@@ -41,6 +41,6 @@ public abstract class EventHandler<W extends BaseWorkload> {
     }
 
     private String parse(Event<?> event) {
-        return Server.writeRequest(event);
+        return JsonSupport.writeRequest(event);
     }
 }
