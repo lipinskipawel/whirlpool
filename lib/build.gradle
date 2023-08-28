@@ -1,0 +1,28 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+}
+
+shadowJar {
+    archiveFileName = project.name + ".jar"
+}
+
+compileJava {
+    options.compilerArgs << '-Xdiags:verbose'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,2 +1,3 @@
 rootProject.name = 'whirlpool'
 include('app')
+include('lib')
