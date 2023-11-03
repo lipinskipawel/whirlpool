@@ -31,8 +31,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.function.Predicate.not;
 
 /**
- * ./maelstrom test -w broadcast --bin lipinskipawel/whirlpool/whirlpool.sh --node-count 5 --time-limit 20 \
- *     --rate 10 --nemesis partition --log-stderr
+ * ./maelstrom test -w broadcast --bin whirlpool/whirlpool.sh --node-count 5 --time-limit 20 --rate 10 \
+ *     --nemesis partition --log-stderr
  */
 public final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
     private final AtomicReference<String> nodeId;

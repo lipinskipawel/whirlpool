@@ -9,7 +9,7 @@ import io.github.lipinskipawel.maelstrom.protocol.echo.EchoOk;
 import io.github.lipinskipawel.maelstrom.protocol.echo.EchoWorkload;
 
 /**
- * ./maelstrom test -w broadcast --bin lipinskipawel/whirlpool/whirlpool.sh --node-count 1 --time-limit 10 --log-stderr
+ * ./maelstrom test -w broadcast --bin whirlpool/whirlpool.sh --node-count 1 --time-limit 10 --log-stderr
  */
 public final class EchoHandler extends EventHandler<EchoWorkload> {
 

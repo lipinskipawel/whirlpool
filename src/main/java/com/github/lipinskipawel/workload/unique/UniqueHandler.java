@@ -11,8 +11,8 @@ import io.github.lipinskipawel.maelstrom.protocol.unique.UniqueWorkload;
 import static java.util.UUID.randomUUID;
 
 /**
- * ./maelstrom test -w unique-ids --bin lipinskipawel/whirlpool/whirlpool.sh --time-limit 30 --rate 1000 \
- *     --node-count 3 --availability total --nemesis partition --log-stderr
+ * ./maelstrom test -w unique-ids --bin whirlpool/whirlpool.sh --time-limit 30 --rate 1000 --node-count 3 \
+ *     --availability total --nemesis partition --log-stderr
  */
 public final class UniqueHandler extends EventHandler<UniqueWorkload> {
 
