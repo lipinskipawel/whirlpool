@@ -5,7 +5,7 @@ import com.github.lipinskipawel.workload.broadcast.Internal;
 
 import java.util.Map;
 
-import static com.github.lipinskipawel.whirlpool.framework.Server.workloadWithCustomEvent;
+import static io.github.lipinskipawel.maelstrom.framework.Server.workloadWithCustomEvent;
 
 /**
  * Run server with logs

@@ -1,5 +1,44 @@
-wrapper {
-    version = "7.4.2"
-    distributionType = Wrapper.DistributionType.ALL
+plugins {
+    id 'java-library'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.lipinskipawel:maelstrom-java:0.1.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+}
+
+tasks {
+    application {
+        mainClass = 'com.github.lipinskipawel.App'
+    }
+
+    jar {
+        manifest {
+            attributes 'Main-Class': application.mainClassName
+        }
+    }
+
+    shadowJar {
+        archiveFileName = project.name + ".jar"
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    wrapper {
+        gradleVersion = "7.4.2"
+        distributionType = Wrapper.DistributionType.ALL
+    }
+}
