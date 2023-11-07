@@ -4,6 +4,7 @@ import io.github.lipinskipawel.maelstrom.framework.Event;
 import io.github.lipinskipawel.maelstrom.framework.EventHandler;
 import io.github.lipinskipawel.maelstrom.protocol.Init;
 import io.github.lipinskipawel.maelstrom.protocol.InitOk;
+import io.github.lipinskipawel.maelstrom.protocol.Quit;
 import io.github.lipinskipawel.maelstrom.protocol.unique.Unique;
 import io.github.lipinskipawel.maelstrom.protocol.unique.UniqueOk;
 import io.github.lipinskipawel.maelstrom.protocol.unique.UniqueWorkload;
@@ -18,12 +19,11 @@ public final class UniqueHandler extends EventHandler<UniqueWorkload> {
 
     @Override
     public void handle(Event<UniqueWorkload> event) {
-        final var body = event.body;
-        if (body instanceof Init) {
-            replyAndSend(event, new InitOk());
-        }
-        if (body instanceof Unique) {
-            replyAndSend(event, new UniqueOk(randomUUID()));
+        switch (event.body) {
+            case Init __ -> replyAndSend(event, new InitOk());
+            case Unique __ -> replyAndSend(event, new UniqueOk(randomUUID()));
+            case Quit __ -> {
+            }
         }
     }
 }

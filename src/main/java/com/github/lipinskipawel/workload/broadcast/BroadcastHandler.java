@@ -54,47 +54,55 @@ public final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
 
     @Override
     public void handle(Event<BroadcastWorkload> event) {
-        final var body = event.body;
-        if (body instanceof Init init) {
-            this.nodeId.set(init.nodeId);
-            this.reachableNodes.addAll(init.nodeIds.stream().filter(not(it -> it.equals(nodeId.get()))).toList());
-            replyAndSend(event, new InitOk());
-            return;
+        switch (event.body) {
+            case Init init -> initEvent(init, event);
+            case Broadcast broadcast -> broadcastEvent(broadcast, event);
+            case Read __ -> readEvent(event);
+            case Topology topology -> topologyEvent(topology, event);
+            case CustomRequest customRequest -> customRequestEvent(customRequest, event);
+            case Quit __ -> quitEvent();
         }
-        if (body instanceof Broadcast broadcast) {
-            this.messages.add(broadcast.message);
-            replyAndSend(event, new BroadcastOk());
-            return;
+    }
+
+    private void initEvent(Init init, Event<BroadcastWorkload> event) {
+        this.nodeId.set(init.nodeId);
+        this.reachableNodes.addAll(init.nodeIds.stream().filter(not(it -> it.equals(nodeId.get()))).toList());
+        replyAndSend(event, new InitOk());
+    }
+
+    private void broadcastEvent(Broadcast broadcast, Event<BroadcastWorkload> event) {
+        this.messages.add(broadcast.message);
+        replyAndSend(event, new BroadcastOk());
+    }
+
+    private void readEvent(Event<BroadcastWorkload> event) {
+        replyAndSend(event, new ReadOk(this.messages.stream().toList()));
+    }
+
+    private void topologyEvent(Topology topology, Event<BroadcastWorkload> event) {
+        this.reachableNodes = new CopyOnWriteArrayList<>(topology.topology.get(this.nodeId.get()));
+        this.reachableNodes.forEach(it -> this.known.put(it, new CopyOnWriteArraySet<>()));
+        replyAndSend(event, new TopologyOk());
+    }
+
+    private void customRequestEvent(CustomRequest customRequest, Event<BroadcastWorkload> event) {
+        if (customRequest instanceof Internal internal) {
+            this.known.computeIfPresent(event.src, (k, v) -> {
+                v.addAll(internal.messagesFromOtherNode);
+                return v;
+            });
+            this.messages.addAll(internal.messagesFromOtherNode);
         }
-        if (body instanceof Read) {
-            replyAndSend(event, new ReadOk(this.messages.stream().toList()));
-            return;
-        }
-        if (body instanceof Topology topology) {
-            this.reachableNodes = new CopyOnWriteArrayList<>(topology.topology.get(this.nodeId.get()));
-            this.reachableNodes.forEach(it -> this.known.put(it, new CopyOnWriteArraySet<>()));
-            replyAndSend(event, new TopologyOk());
-            return;
-        }
-        if (body instanceof CustomRequest customRequest) {
-            if (customRequest instanceof Internal internal) {
-                this.known.computeIfPresent(event.src, (k, v) -> {
-                    v.addAll(internal.messagesFromOtherNode);
-                    return v;
-                });
-                this.messages.addAll(internal.messagesFromOtherNode);
-                return;
-            }
-        }
-        if (body instanceof Quit) {
-            try {
-                Thread.sleep(900);
-                this.schedule.shutdownNow();
-                this.schedule.awaitTermination(500, MILLISECONDS);
-            } catch (InterruptedException e) {
-                System.err.println("Exception during shutdown of: " + getClass());
-                System.err.println(e);
-            }
+    }
+
+    private void quitEvent() {
+        try {
+            Thread.sleep(900);
+            this.schedule.shutdownNow();
+            this.schedule.awaitTermination(500, MILLISECONDS);
+        } catch (InterruptedException e) {
+            System.err.println("Exception during shutdown of: " + getClass());
+            System.err.println(e);
         }
     }
 
@@ -109,7 +117,7 @@ public final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
                     final var extended = extendedByKnownMessage(it, toSend);
                     return createEvent(0, nodeId.get(), it, new Internal(extended));
                 })
-                .filter(not(it -> it.body.messagesFromOtherNode.size() == 0))
+                .filter(not(it -> it.body.messagesFromOtherNode.isEmpty()))
                 .forEach(this::send);
     }
 

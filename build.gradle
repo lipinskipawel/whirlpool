@@ -19,13 +19,18 @@ dependencies {
 }
 
 tasks {
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
     application {
         mainClass = 'com.github.lipinskipawel.App'
     }
 
     jar {
         manifest {
-            attributes 'Main-Class': application.mainClassName
+            attributes 'Main-Class': application.mainClass
         }
     }
 
@@ -38,7 +43,23 @@ tasks {
     }
 
     wrapper {
-        gradleVersion = "7.4.2"
+        gradleVersion = "8.4"
         distributionType = Wrapper.DistributionType.ALL
+    }
+
+    distZip {
+        dependsOn shadowJar
+    }
+
+    distTar {
+        dependsOn shadowJar
+    }
+
+    startScripts {
+        dependsOn shadowJar
+    }
+
+    startShadowScripts {
+        dependsOn jar
     }
 }
