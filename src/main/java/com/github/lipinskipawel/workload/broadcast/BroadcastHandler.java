@@ -1,18 +1,18 @@
 package com.github.lipinskipawel.workload.broadcast;
 
-import io.github.lipinskipawel.maelstrom.framework.Event;
-import io.github.lipinskipawel.maelstrom.framework.EventHandler;
-import io.github.lipinskipawel.maelstrom.protocol.CustomRequest;
-import io.github.lipinskipawel.maelstrom.protocol.Init;
-import io.github.lipinskipawel.maelstrom.protocol.InitOk;
-import io.github.lipinskipawel.maelstrom.protocol.Quit;
-import io.github.lipinskipawel.maelstrom.protocol.broadcast.Broadcast;
-import io.github.lipinskipawel.maelstrom.protocol.broadcast.BroadcastOk;
-import io.github.lipinskipawel.maelstrom.protocol.broadcast.BroadcastWorkload;
-import io.github.lipinskipawel.maelstrom.protocol.broadcast.Read;
-import io.github.lipinskipawel.maelstrom.protocol.broadcast.ReadOk;
-import io.github.lipinskipawel.maelstrom.protocol.broadcast.Topology;
-import io.github.lipinskipawel.maelstrom.protocol.broadcast.TopologyOk;
+import com.github.lipinskipawel.maelstrom.framework.Event;
+import com.github.lipinskipawel.maelstrom.framework.EventHandler;
+import com.github.lipinskipawel.maelstrom.protocol.CustomRequest;
+import com.github.lipinskipawel.maelstrom.protocol.Init;
+import com.github.lipinskipawel.maelstrom.protocol.InitOk;
+import com.github.lipinskipawel.maelstrom.protocol.Quit;
+import com.github.lipinskipawel.maelstrom.protocol.broadcast.Broadcast;
+import com.github.lipinskipawel.maelstrom.protocol.broadcast.BroadcastOk;
+import com.github.lipinskipawel.maelstrom.protocol.broadcast.BroadcastWorkload;
+import com.github.lipinskipawel.maelstrom.protocol.broadcast.Read;
+import com.github.lipinskipawel.maelstrom.protocol.broadcast.ReadOk;
+import com.github.lipinskipawel.maelstrom.protocol.broadcast.Topology;
+import com.github.lipinskipawel.maelstrom.protocol.broadcast.TopologyOk;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import static io.github.lipinskipawel.maelstrom.framework.Event.createEvent;
+import static com.github.lipinskipawel.maelstrom.framework.Event.createEvent;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.function.Predicate.not;

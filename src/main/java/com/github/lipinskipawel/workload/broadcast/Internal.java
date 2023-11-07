@@ -1,8 +1,8 @@
 package com.github.lipinskipawel.workload.broadcast;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.lipinskipawel.maelstrom.protocol.CustomRequest;
-import io.github.lipinskipawel.maelstrom.protocol.EventType;
+import com.github.lipinskipawel.maelstrom.protocol.CustomRequest;
+import com.github.lipinskipawel.maelstrom.protocol.EventType;
 
 import java.util.List;
 

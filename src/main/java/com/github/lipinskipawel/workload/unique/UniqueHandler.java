@@ -1,13 +1,13 @@
 package com.github.lipinskipawel.workload.unique;
 
-import io.github.lipinskipawel.maelstrom.framework.Event;
-import io.github.lipinskipawel.maelstrom.framework.EventHandler;
-import io.github.lipinskipawel.maelstrom.protocol.Init;
-import io.github.lipinskipawel.maelstrom.protocol.InitOk;
-import io.github.lipinskipawel.maelstrom.protocol.Quit;
-import io.github.lipinskipawel.maelstrom.protocol.unique.Unique;
-import io.github.lipinskipawel.maelstrom.protocol.unique.UniqueOk;
-import io.github.lipinskipawel.maelstrom.protocol.unique.UniqueWorkload;
+import com.github.lipinskipawel.maelstrom.framework.Event;
+import com.github.lipinskipawel.maelstrom.framework.EventHandler;
+import com.github.lipinskipawel.maelstrom.protocol.Init;
+import com.github.lipinskipawel.maelstrom.protocol.InitOk;
+import com.github.lipinskipawel.maelstrom.protocol.Quit;
+import com.github.lipinskipawel.maelstrom.protocol.unique.Unique;
+import com.github.lipinskipawel.maelstrom.protocol.unique.UniqueOk;
+import com.github.lipinskipawel.maelstrom.protocol.unique.UniqueWorkload;
 
 import static java.util.UUID.randomUUID;
 
