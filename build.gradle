@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.lipinskipawel:maelstrom-java:0.1.0'
+    implementation 'com.github.lipinskipawel:maelstrom-java:0.2.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.2'
 
@@ -25,7 +25,7 @@ tasks {
     }
 
     application {
-        mainClass = 'com.github.lipinskipawel.App'
+        mainClass = 'com.github.lipinskipawel.whirlpool.App'
     }
 
     jar {

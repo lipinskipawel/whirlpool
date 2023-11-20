@@ -1,18 +1,18 @@
-package com.github.lipinskipawel.workload.broadcast;
+package com.github.lipinskipawel.whirlpool.workload.broadcast;
 
-import com.github.lipinskipawel.maelstrom.framework.Event;
-import com.github.lipinskipawel.maelstrom.framework.EventHandler;
-import com.github.lipinskipawel.maelstrom.protocol.CustomRequest;
-import com.github.lipinskipawel.maelstrom.protocol.Init;
-import com.github.lipinskipawel.maelstrom.protocol.InitOk;
-import com.github.lipinskipawel.maelstrom.protocol.Quit;
-import com.github.lipinskipawel.maelstrom.protocol.broadcast.Broadcast;
-import com.github.lipinskipawel.maelstrom.protocol.broadcast.BroadcastOk;
-import com.github.lipinskipawel.maelstrom.protocol.broadcast.BroadcastWorkload;
-import com.github.lipinskipawel.maelstrom.protocol.broadcast.Read;
-import com.github.lipinskipawel.maelstrom.protocol.broadcast.ReadOk;
-import com.github.lipinskipawel.maelstrom.protocol.broadcast.Topology;
-import com.github.lipinskipawel.maelstrom.protocol.broadcast.TopologyOk;
+import com.github.lipinskipawel.maelstrom.api.framework.EventHandler;
+import com.github.lipinskipawel.maelstrom.api.protocol.Event;
+import com.github.lipinskipawel.maelstrom.api.protocol.Init;
+import com.github.lipinskipawel.maelstrom.api.protocol.InitOk;
+import com.github.lipinskipawel.maelstrom.api.protocol.Quit;
+import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.Broadcast;
+import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.BroadcastOk;
+import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.BroadcastWorkload;
+import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.Read;
+import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.ReadOk;
+import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.Topology;
+import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.TopologyOk;
+import com.github.lipinskipawel.maelstrom.spi.protocol.CustomEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import static com.github.lipinskipawel.maelstrom.framework.Event.createEvent;
+import static com.github.lipinskipawel.maelstrom.api.protocol.Event.createEvent;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.function.Predicate.not;
@@ -59,7 +59,7 @@ public final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
             case Broadcast broadcast -> broadcastEvent(broadcast, event);
             case Read __ -> readEvent(event);
             case Topology topology -> topologyEvent(topology, event);
-            case CustomRequest customRequest -> customRequestEvent(customRequest, event);
+            case CustomEvent customEvent -> customRequestEvent(customEvent, event);
             case Quit __ -> quitEvent();
         }
     }
@@ -67,26 +67,26 @@ public final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
     private void initEvent(Init init, Event<BroadcastWorkload> event) {
         this.nodeId.set(init.nodeId);
         this.reachableNodes.addAll(init.nodeIds.stream().filter(not(it -> it.equals(nodeId.get()))).toList());
-        replyAndSend(event, new InitOk());
+        send(event.reply(new InitOk()));
     }
 
     private void broadcastEvent(Broadcast broadcast, Event<BroadcastWorkload> event) {
         this.messages.add(broadcast.message);
-        replyAndSend(event, new BroadcastOk());
+        send(event.reply(new BroadcastOk()));
     }
 
     private void readEvent(Event<BroadcastWorkload> event) {
-        replyAndSend(event, new ReadOk(this.messages.stream().toList()));
+        send(event.reply(new ReadOk(this.messages.stream().toList())));
     }
 
     private void topologyEvent(Topology topology, Event<BroadcastWorkload> event) {
         this.reachableNodes = new CopyOnWriteArrayList<>(topology.topology.get(this.nodeId.get()));
         this.reachableNodes.forEach(it -> this.known.put(it, new CopyOnWriteArraySet<>()));
-        replyAndSend(event, new TopologyOk());
+        send(event.reply(new TopologyOk()));
     }
 
-    private void customRequestEvent(CustomRequest customRequest, Event<BroadcastWorkload> event) {
-        if (customRequest instanceof Internal internal) {
+    private void customRequestEvent(CustomEvent customEvent, Event<BroadcastWorkload> event) {
+        if (customEvent instanceof Internal internal) {
             this.known.computeIfPresent(event.src, (k, v) -> {
                 v.addAll(internal.messagesFromOtherNode);
                 return v;
