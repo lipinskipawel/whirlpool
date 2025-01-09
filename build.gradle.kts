@@ -5,12 +5,11 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation("com.github.lipinskipawel:maelstrom-java:0.2.0")
+    implementation("com.github.lipinskipawel:maelstrom-java:0.4.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.14.2")
 

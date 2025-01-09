@@ -139,8 +139,4 @@ public final class BroadcastHandler extends EventHandler<BroadcastWorkload> {
             return toSend;
         }
     }
-
-    private static void debug(String debug) {
-        System.err.println(debug);
-    }
 }
