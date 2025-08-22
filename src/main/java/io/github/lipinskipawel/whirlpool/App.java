@@ -1,11 +1,11 @@
-package com.github.lipinskipawel.whirlpool;
+package io.github.lipinskipawel.whirlpool;
 
-import com.github.lipinskipawel.whirlpool.workload.broadcast.BroadcastHandler;
-import com.github.lipinskipawel.whirlpool.workload.broadcast.Internal;
+import io.github.lipinskipawel.whirlpool.workload.broadcast.BroadcastHandler;
+import io.github.lipinskipawel.whirlpool.workload.broadcast.Internal;
 
 import java.util.Map;
 
-import static com.github.lipinskipawel.maelstrom.api.framework.ServerBuilder.server;
+import static io.github.lipinskipawel.maelstrom.api.framework.ServerBuilder.server;
 
 /**
  * Run server with logs

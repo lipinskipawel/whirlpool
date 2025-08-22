@@ -1,18 +1,18 @@
-package com.github.lipinskipawel.whirlpool.workload.broadcast;
+package io.github.lipinskipawel.whirlpool.workload.broadcast;
 
-import com.github.lipinskipawel.maelstrom.api.framework.EventHandler;
-import com.github.lipinskipawel.maelstrom.api.protocol.Event;
-import com.github.lipinskipawel.maelstrom.api.protocol.Init;
-import com.github.lipinskipawel.maelstrom.api.protocol.InitOk;
-import com.github.lipinskipawel.maelstrom.api.protocol.Quit;
-import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.Broadcast;
-import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.BroadcastOk;
-import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.BroadcastWorkload;
-import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.Read;
-import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.ReadOk;
-import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.Topology;
-import com.github.lipinskipawel.maelstrom.api.protocol.broadcast.TopologyOk;
-import com.github.lipinskipawel.maelstrom.spi.protocol.CustomEvent;
+import io.github.lipinskipawel.maelstrom.api.framework.EventHandler;
+import io.github.lipinskipawel.maelstrom.api.protocol.Event;
+import io.github.lipinskipawel.maelstrom.api.protocol.Init;
+import io.github.lipinskipawel.maelstrom.api.protocol.InitOk;
+import io.github.lipinskipawel.maelstrom.api.protocol.Quit;
+import io.github.lipinskipawel.maelstrom.api.protocol.broadcast.Broadcast;
+import io.github.lipinskipawel.maelstrom.api.protocol.broadcast.BroadcastOk;
+import io.github.lipinskipawel.maelstrom.api.protocol.broadcast.BroadcastWorkload;
+import io.github.lipinskipawel.maelstrom.api.protocol.broadcast.Read;
+import io.github.lipinskipawel.maelstrom.api.protocol.broadcast.ReadOk;
+import io.github.lipinskipawel.maelstrom.api.protocol.broadcast.Topology;
+import io.github.lipinskipawel.maelstrom.api.protocol.broadcast.TopologyOk;
+import io.github.lipinskipawel.maelstrom.spi.protocol.CustomEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import static com.github.lipinskipawel.maelstrom.api.protocol.Event.createEvent;
+import static io.github.lipinskipawel.maelstrom.api.protocol.Event.createEvent;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.function.Predicate.not;

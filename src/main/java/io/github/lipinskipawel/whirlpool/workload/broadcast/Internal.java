@@ -1,8 +1,8 @@
-package com.github.lipinskipawel.whirlpool.workload.broadcast;
+package io.github.lipinskipawel.whirlpool.workload.broadcast;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.lipinskipawel.maelstrom.api.protocol.EventType;
-import com.github.lipinskipawel.maelstrom.spi.protocol.CustomEvent;
+import io.github.lipinskipawel.maelstrom.api.protocol.EventType;
+import io.github.lipinskipawel.maelstrom.spi.protocol.CustomEvent;
 
 import java.util.List;
 
